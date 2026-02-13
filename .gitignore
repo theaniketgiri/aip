@@ -1,0 +1,41 @@
+# ── Commercial Product (PRIVATE — never push) ──
+kya_api/
+dashboard/
+Dockerfile
+docker-compose.yml
+Caddyfile
+start.sh
+data/
+
+# ── Logs & Runtime ──
+*.log
+startup.log
+backend.log
+frontend.log
+nohup.out
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.whl
+.eggs/
+
+# ── Environment ──
+.env
+.venv/
+venv/
+env/
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS ──
+.DS_Store
+Thumbs.db

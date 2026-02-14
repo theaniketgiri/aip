@@ -1,13 +1,35 @@
-# AIP Protocol — Agent Intent Protocol SDK
+# AIP Protocol — Agent Intent Protocol
 
-> **Proof of Intent for the Agentic Web**
+> **Proof of Intent for the Agentic Web** · [Live Dashboard](https://kya.synthexai.tech) · [API Docs](https://kya.synthexai.tech/api/health)
 
 AIP-1 is a trustless, cross-platform protocol for verifying the identity, intent, and authorization boundaries of autonomous AI agents. Think of it as **OAuth + TLS, but for AI agents talking to each other**.
+
+Built by [KYA Labs](https://kya.synthexai.tech) — *Know Your Agent before it acts.*
+
+---
+
+## Why AIP?
+
+Every AI framework lets agents **do things**. None of them verify **what agents are allowed to do**. AIP fixes this:
+
+- 🔐 **Cryptographic Identity** — Ed25519 keypair per agent, DID-based addressing
+- 🧱 **Boundary Enforcement** — Action allowlists, monetary limits, domain scoping
+- ✅ **Tiered Verification** — Sub-millisecond for low-risk, full crypto for high-value
+- 🔴 **Kill Switch** — Revoke or suspend any agent in real-time
+- 📊 **Trust Scores** — Bayesian reputation based on historical behavior
 
 ## Install
 
 ```bash
-pip install -e .
+pip install aip-protocol
+```
+
+Or from source:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/aip-protocol.git
+cd aip-protocol
+pip install -e ".[dev]"
 ```
 
 ## Quick Start
@@ -23,7 +45,6 @@ passport = AgentPassport.create(
     allowed_actions=["read_invoice", "transfer_funds"],
     monetary_limit_per_txn=50.0,
 )
-passport.save("./my_agent")
 
 # 2. Create and sign an intent
 envelope = create_envelope(
@@ -43,6 +64,25 @@ if result.passed:
 else:
     print(f"✗ Rejected: {result.errors}")
 ```
+
+## Hosted API
+
+Don't want to self-host verification? Use our cloud API:
+
+```bash
+# Get an API key
+curl -X POST https://kya.synthexai.tech/api/keys \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-app", "plan": "starter"}'
+
+# Verify an agent intent
+curl -X POST https://kya.synthexai.tech/api/verify \
+  -H "X-API-Key: kya_YOUR_KEY_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{"agent_id": "did:web:example.com:agents:my-bot", "action": "transfer_funds"}'
+```
+
+**Pricing:** $0.005/verification (Starter) · $0.003 (Pro) · $0.001 (Enterprise)
 
 ## CLI
 
@@ -100,7 +140,17 @@ Not every intent needs full crypto. AIP auto-selects the verification tier:
 ```bash
 pip install -e ".[dev]"
 pytest tests/ -v
+# 38 tests, all passing
 ```
+
+## Design Partners
+
+We're looking for **3 early partners** building multi-agent systems. You get:
+- Free Enterprise API access during beta
+- Direct Slack channel with the team
+- Your feedback shapes the protocol
+
+**Interested?** Open an issue or reach out → [Dashboard](https://kya.synthexai.tech)
 
 ## License
 

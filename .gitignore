@@ -1,10 +1,12 @@
 # ── Commercial Product (PRIVATE — never push) ──
 kya_api/
 dashboard/
+*.pem
 Dockerfile
 docker-compose.yml
 Caddyfile
 start.sh
+setup.sh
 data/
 
 # ── Logs & Runtime ──

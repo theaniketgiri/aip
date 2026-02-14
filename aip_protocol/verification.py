@@ -225,6 +225,18 @@ def verify_intent(
 
     result.within_boundaries = True
 
+    # ─── Step 5b: REVOCATION_CHECK (all tiers — security critical) ────
+    # Revocation must be checked even on Tier 0 to prevent suspended/revoked
+    # agents from bypassing the kill switch via the fast path.
+    if store.is_revoked(envelope.agent.id):
+        is_suspended = store.is_suspended(envelope.agent.id)
+        if is_suspended:
+            errors.append(AIPErrorCode.AGENT_SUSPENDED)
+            return _fail(result, errors, "Agent is temporarily suspended")
+        else:
+            errors.append(AIPErrorCode.AGENT_REVOKED)
+            return _fail(result, errors, "Agent has been revoked")
+
     # ═══ Tier 0 stops here — fast path complete ═══════════════════════
     if tier == VerificationTier.TIER_0:
         trust.record_success(envelope.agent.id)

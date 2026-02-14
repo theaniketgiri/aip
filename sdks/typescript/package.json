@@ -1,0 +1,31 @@
+{
+  "name": "aip-protocol",
+  "version": "0.1.0",
+  "description": "AIP-1 Agent Intent Protocol — TypeScript SDK",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "conformance": "node --loader ts-node/esm src/conformance.ts",
+    "test": "node --loader ts-node/esm src/conformance.ts"
+  },
+  "keywords": [
+    "aip",
+    "agent",
+    "protocol",
+    "verification",
+    "intent"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@noble/ed25519": "^3.0.0",
+    "@noble/hashes": "^2.0.1",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

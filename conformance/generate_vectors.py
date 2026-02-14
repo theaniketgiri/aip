@@ -504,6 +504,111 @@ vectors["G02_negative_amount_passes"] = {
 }
 
 
+# ─── CATEGORY H: Canonical Serialization ─────────────────────────
+# These vectors specifically test that float normalization, key ordering,
+# and datetime formatting are consistent across languages.
+
+# H01: Whole float → integer in canonical form
+e_float = sign_env(make_envelope(amount=500.0, monetary_limit=1000.0, nonce=nonce()))
+payload_h01 = _get_signable_payload(IntentEnvelope.model_validate(to_dict(e_float)))
+vectors["H01_float_normalization"] = {
+    "description": "Whole floats (500.0) MUST serialize as integers (500) in the canonical payload. This ensures Python/JS/Go produce identical bytes.",
+    "category": "serialization",
+    "envelope": to_dict(e_float),
+    "verify_with": "agent_1",
+    "canonical_payload_hex": payload_h01.hex(),
+    "assertions": [
+        "canonical payload MUST contain '\"amount\":500,' NOT '\"amount\":500.0,'",
+        "canonical payload MUST contain '\"per_transaction\":1000' NOT '\"per_transaction\":1000.0'",
+    ],
+    "expected": {"valid": True, "signature_valid": True},
+}
+
+# H02: Non-whole float preserves decimal
+e_decimal = sign_env(make_envelope(amount=45.5, monetary_limit=1000.0, nonce=nonce()))
+payload_h02 = _get_signable_payload(IntentEnvelope.model_validate(to_dict(e_decimal)))
+vectors["H02_decimal_preserved"] = {
+    "description": "Non-whole floats (45.5) MUST preserve their decimal in the canonical payload.",
+    "category": "serialization",
+    "envelope": to_dict(e_decimal),
+    "verify_with": "agent_1",
+    "canonical_payload_hex": payload_h02.hex(),
+    "assertions": [
+        "canonical payload MUST contain '\"amount\":45.5,' NOT '\"amount\":45,'",
+    ],
+    "expected": {"valid": True, "signature_valid": True},
+}
+
+# H03: Key ordering — verify nested keys are sorted recursively
+e_keys = sign_env(make_envelope(nonce=nonce()))
+payload_h03 = _get_signable_payload(IntentEnvelope.model_validate(to_dict(e_keys)))
+decoded_h03 = payload_h03.decode()
+# Verify @context comes before @type (@ sorts before anything else in ASCII)
+assert '"@context"' in decoded_h03
+assert decoded_h03.index('"@context"') < decoded_h03.index('"@type"')
+vectors["H03_key_ordering"] = {
+    "description": "Keys MUST be sorted lexicographically at ALL nesting levels. '@context' MUST appear before '@type', 'agent' before 'boundaries', etc.",
+    "category": "serialization",
+    "envelope": to_dict(e_keys),
+    "verify_with": "agent_1",
+    "canonical_payload_hex": payload_h03.hex(),
+    "assertions": [
+        "'@context' MUST appear before '@type' in canonical form",
+        "'agent' MUST appear before 'boundaries'",
+        "'boundaries' MUST appear before 'entropy'",
+        "Nested keys within 'agent' MUST also be sorted",
+    ],
+    "expected": {"valid": True, "signature_valid": True},
+}
+
+# H04: Datetime format — ISO 8601 with Z suffix
+e_dt = sign_env(make_envelope(nonce=nonce()))
+payload_h04 = _get_signable_payload(IntentEnvelope.model_validate(to_dict(e_dt)))
+decoded_h04 = payload_h04.decode()
+vectors["H04_datetime_format"] = {
+    "description": "Datetimes MUST be serialized as ISO 8601 with 'Z' suffix for UTC. Example: '2026-02-14T12:00:00Z' NOT '2026-02-14T12:00:00+00:00'.",
+    "category": "serialization",
+    "envelope": to_dict(e_dt),
+    "verify_with": "agent_1",
+    "canonical_payload_hex": payload_h04.hex(),
+    "assertions": [
+        "issued_at MUST end with 'Z' not '+00:00'",
+        "granted_at in delegation_chain MUST end with 'Z' not '+00:00'",
+    ],
+    "expected": {"valid": True, "signature_valid": True},
+}
+
+# H05: Null handling — null values MUST serialize as 'null' not be omitted
+e_null = sign_env(make_envelope(nonce=nonce()))
+payload_h05 = _get_signable_payload(IntentEnvelope.model_validate(to_dict(e_null)))
+decoded_h05 = payload_h05.decode()
+vectors["H05_null_handling"] = {
+    "description": "Null values MUST be serialized as JSON null, NOT omitted. Fields like 'expires_at':null MUST appear in canonical form.",
+    "category": "serialization",
+    "envelope": to_dict(e_null),
+    "verify_with": "agent_1",
+    "canonical_payload_hex": payload_h05.hex(),
+    "assertions": [
+        "'expires_at':null MUST appear in canonical payload",
+        "null fields MUST NOT be omitted",
+    ],
+    "expected": {"valid": True, "signature_valid": True},
+}
+
+
+# ─── CATEGORY A (continued): Nonce Validation ────────────────────
+
+# A05: Short nonce rejected
+e_short_nonce = sign_env(make_envelope(nonce="nonce:abc"))
+vectors["A05_short_nonce_rejected"] = {
+    "description": "A nonce shorter than 38 characters (6 prefix + 32 hex = 16 bytes entropy) MUST be rejected with AIP-E105.",
+    "category": "envelope_validity",
+    "envelope": to_dict(e_short_nonce),
+    "verify_with": "agent_1",
+    "expected": {"valid": False, "errors": ["AIP-E105"]},
+}
+
+
 # ─── Write output ────────────────────────────────────────────────
 
 if __name__ == "__main__":

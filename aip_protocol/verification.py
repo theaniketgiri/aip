@@ -194,8 +194,17 @@ def verify_intent(
             errors.append(AIPErrorCode.EXPIRED_ENVELOPE)
             return _fail(result, errors, "Intent envelope has expired")
 
-    # ─── Step 3b: REPLAY_CHECK (all tiers) ────────────────────────────
-    if not store.check_nonce(envelope.entropy):
+    # ─── Step 3b: NONCE_VALIDATION (all tiers) ──────────────────────
+    # AIP-1 §10: Nonces MUST be at least 16 bytes of entropy.
+    # Format: "nonce:<hex>" where hex is ≥32 characters (16 bytes).
+    # This prevents weak nonces that make replay attacks trivial.
+    nonce = envelope.entropy
+    if not nonce or len(nonce) < 38:  # "nonce:" (6) + 32 hex chars = 38
+        errors.append(AIPErrorCode.NONCE_INVALID)
+        return _fail(result, errors, f"Nonce too short: {len(nonce) if nonce else 0} chars, minimum 38")
+
+    # ─── Step 3c: REPLAY_CHECK (all tiers) ────────────────────────────
+    if not store.check_nonce(nonce):
         errors.append(AIPErrorCode.REPLAY_DETECTED)
         return _fail(result, errors, "Nonce reuse detected — possible replay attack")
 

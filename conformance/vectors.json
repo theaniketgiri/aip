@@ -17,7 +17,7 @@
       "hmac_key_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
     },
     "canonical_serialization": "Signable payload = model_dump(mode='json', by_alias=True, exclude={'proof'}) -> json.dumps(sort_keys=True, separators=(',', ':')) -> UTF-8 bytes",
-    "reference_canonical_payload_hex": "7b2240636f6e74657874223a2268747470733a2f2f6169702e70726f746f636f6c2f7631222c224074797065223a22496e74656e74456e76656c6f7065222c226167656e74223a7b226174746573746174696f6e223a7b226275696c645f68617368223a6e756c6c2c226672616d65776f726b5f6964223a6e756c6c2c22696e74656e745f636c6173736966696572223a7b22636f6e666964656e63655f7468726573686f6c64223a302e39352c226d6f64656c223a226169702d636c61737369666965722d7631227d2c226d6574686f64223a2273656c665f7265706f72746564222c2272656769737472795f7369676e6174757265223a6e756c6c2c2273797374656d5f70726f6d70745f68617368223a6e756c6c7d2c226964223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74222c2272756e74696d65223a226169702d73646b2f302e312e30222c2276657273696f6e223a22312e302e30227d2c22626f756e646172696573223a7b22616c6c6f7765645f616374696f6e73223a5b227472616e736665725f66756e6473222c22726561645f696e766f696365225d2c22646174615f616363657373223a5b5d2c2264656e6965645f616374696f6e73223a5b5d2c2267656f5f7265737472696374696f6e223a6e756c6c2c226d6f6e65746172795f6c696d6974223a7b2263757272656e6379223a22555344222c227065725f646179223a353030302e302c227065725f7472616e73616374696f6e223a3530302e307d2c2274696d655f77696e646f77223a6e756c6c7d2c22656e74726f7079223a226e6f6e63653a3030303030303030303030303030303030303030303030303030303030303031222c22657870697265735f6174223a6e756c6c2c22696e74656e74223a7b22616374696f6e223a227472616e736665725f66756e6473222c22706172616d6574657273223a7b22616d6f756e74223a3230302e302c2263757272656e6379223a22555344227d2c22746172676574223a226469643a7765623a76656e646f722e636f6d3a6167656e74733a62696c6c696e67227d2c226973737565645f6174223a22323032362d30322d31345431323a30303a30305a222c227072696e636970616c223a7b2264656c65676174696f6e5f636861696e223a5b7b22626f756e646172795f6d6f6e6f746f6e6963697479223a747275652c22657870697265735f6174223a6e756c6c2c2266726f6d223a226469643a7765623a61636d652e636f6d222c226772616e7465645f6174223a22323032362d30312d30315430303a30303a30305a222c2273636f7065223a2264656661756c74222c22746f223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74227d5d2c226964223a226469643a7765623a61636d652e636f6d222c2274797065223a226f7267616e697a6174696f6e227d2c2270726f746f636f6c5f76657273696f6e223a22312e302e30222c2274746c223a3330302c22766572696669636174696f6e5f74696572223a22746965725f31227d"
+    "reference_canonical_payload_hex": "7b2240636f6e74657874223a2268747470733a2f2f6169702e70726f746f636f6c2f7631222c224074797065223a22496e74656e74456e76656c6f7065222c226167656e74223a7b226174746573746174696f6e223a7b226275696c645f68617368223a6e756c6c2c226672616d65776f726b5f6964223a6e756c6c2c22696e74656e745f636c6173736966696572223a7b22636f6e666964656e63655f7468726573686f6c64223a302e39352c226d6f64656c223a226169702d636c61737369666965722d7631227d2c226d6574686f64223a2273656c665f7265706f72746564222c2272656769737472795f7369676e6174757265223a6e756c6c2c2273797374656d5f70726f6d70745f68617368223a6e756c6c7d2c226964223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74222c2272756e74696d65223a226169702d73646b2f302e312e30222c2276657273696f6e223a22312e302e30227d2c22626f756e646172696573223a7b22616c6c6f7765645f616374696f6e73223a5b227472616e736665725f66756e6473222c22726561645f696e766f696365225d2c22646174615f616363657373223a5b5d2c2264656e6965645f616374696f6e73223a5b5d2c2267656f5f7265737472696374696f6e223a6e756c6c2c226d6f6e65746172795f6c696d6974223a7b2263757272656e6379223a22555344222c227065725f646179223a353030302c227065725f7472616e73616374696f6e223a3530307d2c2274696d655f77696e646f77223a6e756c6c7d2c22656e74726f7079223a226e6f6e63653a3030303030303030303030303030303030303030303030303030303030303031222c22657870697265735f6174223a6e756c6c2c22696e74656e74223a7b22616374696f6e223a227472616e736665725f66756e6473222c22706172616d6574657273223a7b22616d6f756e74223a3230302c2263757272656e6379223a22555344227d2c22746172676574223a226469643a7765623a76656e646f722e636f6d3a6167656e74733a62696c6c696e67227d2c226973737565645f6174223a22323032362d30322d31345431323a30303a30305a222c227072696e636970616c223a7b2264656c65676174696f6e5f636861696e223a5b7b22626f756e646172795f6d6f6e6f746f6e6963697479223a747275652c22657870697265735f6174223a6e756c6c2c2266726f6d223a226469643a7765623a61636d652e636f6d222c226772616e7465645f6174223a22323032362d30312d30315430303a30303a30305a222c2273636f7065223a2264656661756c74222c22746f223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74227d5d2c226964223a226469643a7765623a61636d652e636f6d222c2274797065223a226f7267616e697a6174696f6e227d2c2270726f746f636f6c5f76657273696f6e223a22312e302e30222c2274746c223a3330302c22766572696669636174696f6e5f74696572223a22746965725f31227d"
   },
   "A01_valid_envelope": {
     "description": "A correctly formed and signed envelope MUST pass verification.",
@@ -89,7 +89,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "ZUI0IgeCfZCVfy04pqEJKycAHiZnCK0ghTqAHTXRITpoLOKd1gsRP4cugpy3wPLPTlIqNtMqwj3fcr7lgyOECQ=="
+        "proof_value": "Ly_nAMGaEhynisDwAHvddWeTbKS3dmjPmhuJc-LNoF9SzRhg4y7k5NHQ6bu6pwuMbEdK1NSfCAQK47qMYbmfBA=="
       }
     },
     "verify_with": "agent_1",
@@ -170,7 +170,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "FAwSe3OTYCGlKpYOg3aQNc0PPMw3jDaQ6Sq532Vz22OIls_V5Y_kqAggX2coNS6iFmi5TKb8QUSAnExFC2-mAQ=="
+        "proof_value": "1QDMLT6iLrMcqaxo87d-gwur6vDmeNR6HFSLQtlZn7kLGCqP-GvFTiuYO5r9WoFcFpexlbllT8wQ6czvHP2ADA=="
       }
     },
     "verify_with": "agent_1",
@@ -251,7 +251,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "pqSQdfIiTt0ud-Xm8FJRrtMi3YYarJDcjUn03EjWDAO6tM6AOLpI1x2dIKRL7PhfhvCO4Lj0LM2Xu--UvNw3Ag=="
+        "proof_value": "my_GTgWe2M-Xw4TwEwoeLswCb7pBNEyZ9ET3X5Er8Te4Yjjm234mRcsKw4NtyTn3irMd6lhNhmw4ujSGLX2ECg=="
       }
     },
     "verify_with": "agent_1",
@@ -332,7 +332,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "sajRipyxQ_JQkzxKxgRYGArWGuUNhXFKlD3tP1agDQQCAnb5WwPgGu6uv8bL4yRYhTuWnW2yMawyxGBU-AM8DA=="
+        "proof_value": "2skTLON4f5M_JAUoW5dzhGpOYkE9SxznCwuKd-wncTon7TpoS1Urh76wh0Ig58-24s7ZDSgD6SrAMDdbyhuWBQ=="
       }
     },
     "verify_with": "agent_1",
@@ -413,7 +413,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "rVKafWTx7qXpBkgEZMPaf7BqRt7a26wyhuUyzx5ZaYreyhYlufj8O7dmaIbrOVSb3WRibgBrDbP23W9phcuUDQ=="
+        "proof_value": "aqpLuWo_O_Q2HV30ZjSpwHCmv2_azGk6f94EjYQeBp8VOdXKoYmcCOUUFUBBjiBYFBXlXsp5iPjraZHwkVXxDg=="
       }
     },
     "verify_with": "agent_1",
@@ -492,7 +492,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "HnGColq5ldJhLoMWoenAsufEwJZssquUSW19EYERCnyzZ5KQOeu2fxPepSamaW_rqeWWtsfAw1Ke1F-FR4kLAQ=="
+        "proof_value": "ctjUr34dp5M96OypYWsOeHz_W-S0TOKbAgh_FvL4vmWqIKBgOAEp0CDNxFQZjHb0zosX1hV92igQimiz30nsAg=="
       }
     },
     "verify_with": "agent_2",
@@ -574,7 +574,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "uPA_2s7dJeLh2bEd3kJZU4rOlCXxOtQwJ_YQMRyb6FHwfbvBVzZVP3vcS9dS_KjXFLwM__SrrL9b2uic_2HlDA=="
+        "proof_value": "urGK3gZ47N1DeKVzCtB-1HD3JAWZBT7e1IFW5NICp-cW9_lpE4kF1cCHRpCjQ9HPFTXGYUICkW35gxx_1svDAA=="
       }
     },
     "verify_with": "agent_1",
@@ -656,7 +656,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "ZJ3KHFCs1CZrgZwWTEqiDjHa0vYu0AGOqbPxsjb-zkU="
+        "proof_value": "F2H2Ioy4W3rIsHuvchfyQ6SES1Skwpm4AY3SJlThm1E="
       }
     },
     "verify_with": "hmac",
@@ -735,7 +735,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "b-aJHg5AMjSeZ1JPKaBM7bLL3cgWDv_mk12_z-hFt4Q0p4x1vitsBOB_utELt9hGnjCe0GwaPD-8MfFoEWeQAw=="
+        "proof_value": "pd6AjjX7Kz4gFsYViF2198xaBCkCprigs8nl7WcyuVurw2t3jeAe3YPRIPanAMqsDl0PhGS5GzCpH5vbT793Bg=="
       }
     },
     "verify_with": "agent_1",
@@ -813,7 +813,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "S8FGScWe8otqzcbIDKxyQ7Z2-OdWFOqMWJk4cttTwSL8k5yn5DIWOmE5sBJzgjvi11Pv-_RYhGPxIETm_mXaDQ=="
+        "proof_value": "qV9H8hZLwoCAQ9IMfFfCJuRQKYoK3meMaK6RtCwPk109kjm04Y-_1Or4ITe06RLM73NnzvimyRgWoHXexhMVCg=="
       }
     },
     "verify_with": "agent_1",
@@ -898,7 +898,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "nrgCy_7nkpousFcObZi6GNy5-x7fB1UUJCkRmFjd6SC4bKX6AZh_pd2RCy5KD_tVlcyohAMH0_2zPBxNxpPuAg=="
+        "proof_value": "B-mj0TQGrEQXmosJb8YSu6u0gqnD4LQBPXnbHK7os4uZdxw8pTIESxPzTHUH6lQfxpYLi7k6Pjrlggyb7EqmCw=="
       }
     },
     "verify_with": "agent_1",
@@ -977,7 +977,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "f68xB8lONRpK0BBD5raJcTLeF0doMEdVadlZB7pbKdF_CvD5qsNoQ6CwamUFQE0vGdCphq30mEBwCnsKiQJxBw=="
+        "proof_value": "fj1Bk60dhtPeWpOKFYNqkwaYGRPap_mdn8CaCrbV7TjTOiTVkF1RPxqonpDppIREDg8KPcExXcENbOuW2aZCDQ=="
       }
     },
     "verify_with": "agent_1",
@@ -1061,7 +1061,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "FMylD0BSKzvZA2jhxgx9gv0IeCSFn6nPv3WVLN7tFf5we3FisWHsevOS0TiGfp7Eh6L-KEUye7s77Eyr6xjeAw=="
+        "proof_value": "VOMqX7XDYHRL-JccNrphwV9ghbR_nUh6EM-fqeWLQIqtfbAT2mdyCi_RFMErCDX3J4e_X_J8AEIm1vuKAg1TBA=="
       }
     },
     "verify_with": "agent_1",
@@ -1143,7 +1143,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "QPn1F5FPYFyWaP9Hq1162PrINi4gdIj2ZJsXgrqOUkD2pyOKLEpAqSVOx3BpoSi6goul0pmhiXWaz46rsw6YDA=="
+        "proof_value": "4uwaKO_ZIXH4uAa2EcEKIsFJ-BAB1KoREJqdzxogqQMvzm5TwbgDVY9l5mnnqwg4_N-Csj7iOWIa4U7z9c_XBg=="
       }
     },
     "verify_with": "agent_1",
@@ -1222,7 +1222,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "dTjSnycTvpCF0i1PvDa5FWTMPn25RVF-Pspt5ajsKprs7SZH5mwYr6HSiutNFPvhR0f8Xdcw7Jx4DLuR0YlFCw=="
+        "proof_value": "pqd_zTd6-50ZJPLARGJWZJwIULHeM1s88KrwlWbXsYNIWwYsQ6rwy4k03YFSVR8BPDE_Dz6pb-kFlhtdSLJaAw=="
       }
     },
     "verify_with": "agent_1",
@@ -1304,7 +1304,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "CnE2Pu2MbYYzjADIUbzuIEj-ZECCzwbGDWWFOMp64D1rao05PZAyZH4ErKtuybb6867KQT6nInpdbq0x4WYeBA=="
+        "proof_value": "gSSLW9Od66HlCmk_j6Sb93DF4bsnkLIiuIhWA8DRSZ4hPZ7AfKut11Y7JtNU1dgW8KtzPIKjbvgbwpsGgwenAw=="
       }
     },
     "verify_with": "agent_1",
@@ -1384,7 +1384,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "4GjIaCS_raZcG3IYQsqIDfUtFNlL4h1m9mFFNPUN0BpSSVdBIyQgbiRKyo-H_5qpBCk7e1iVVBbbuQLv5HsaAA=="
+        "proof_value": "TPaLRD5zQHR8yb8_XLsLVw_AWHpOXURP5jxn_8AaCS3k6UpM5eLJMQYe7TC8z5kG3bwhxRvOO5kttVMOBTGQCg=="
       }
     },
     "verify_with": "agent_1",
@@ -1467,7 +1467,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "jH_Z0xjMUJkvq3iwQd5xGeyVrEwH09ul3pVxn2DaP3F9FlCHr5-SmTfaYFarCyjs3woT2ne5E0bUiSbzDz2RDQ=="
+        "proof_value": "SJP2QU022TldoS-Lc18X5SSW853TVRM0_cAAd9iWdmAu9Ad4JJlI0ArnaJ025-JSgmkVg_Nm8LSX_LlvUicaAw=="
       }
     },
     "verify_with": "agent_1",
@@ -1546,7 +1546,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "KS5gPgGSJVdUEDU64gwgQgtQatiRsfnQrTBLwIaWe-AHi3mwPwDsrk5KMnumfdAqosVG2WDYJGlqZT-idEHnBg=="
+        "proof_value": "mNVPUM8IB-CaN7RRIS5Onus33_ZSmWODy2yzHm2IptRJqPA1DHQge4QmuLXEgRFfnBADhuxpqd-0seIkyimACQ=="
       }
     },
     "verify_with": "agent_1",
@@ -1637,7 +1637,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "Hjnl4Ag8heTTvNBpkzxtHhUS7QqDYlHUALVjC3uFOH87xIZpu9h9PlRJpi4C3vnGJTR_h1S_CIgW0IExnKnMAA=="
+        "proof_value": "6tEk5G_bUxtdUBmM5sxBk_jDrBXYuZ_yOPuTpbxZ7tNRgJx8zW6sVxwpbo4zDREOIiYA-NbWRapXqI38NqTkAw=="
       }
     },
     "verify_with": "agent_1",
@@ -1728,7 +1728,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "m4c0CewCmTa2pXQhBUznxMGGp0Qtg3gwIYt2WhGxQNmbjBA6mhv0uwGKeLvpr_59O-7aDiVxTI4tk0o-vXJJBg=="
+        "proof_value": "MlSjJrNETIpFDHHfdk6QSeHVQ5WMDzveRxSwwc1GTXcZODpWImqFaLYrkJakm_4pW2SjeIHtpsbXhT4tTAHPAg=="
       }
     },
     "verify_with": "agent_1",
@@ -1819,7 +1819,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "aKzSIBEJykwJSF0FsFJBwTiL5wRl3UVOrjhx6SwzQEYz34mgwXfvEKfAgvh4DcYNXdGscoHr3-mc2rJb0_-dAw=="
+        "proof_value": "ZU7Nn-aIooHYcq_rAsanREB9yXGV6-vRQ1l72TyV7t1Nxoz-DH9LOhaIQMv-fdcsCHujV4JBINSLdNfVDZeRAg=="
       }
     },
     "verify_with": "agent_1",
@@ -1898,7 +1898,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "-sTHLJdj7wqGTeAWnBnk4StvxdcFkDRYwrOr63bAzb75yg_VP3CKfbFTvKDwQmPrIQsab096TCnqnWmV3D26BA=="
+        "proof_value": "M6MIKYFmQjUqvcg_xdtUKBru1yBOhm5pasknd6Smp_wSElOY_ZzWKw66uJcIe88YFNCMm5uel2_JPLaobVJfDQ=="
       }
     },
     "verify_with": "agent_1",
@@ -1977,7 +1977,7 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "W3IqkYOGlwVZkR46xntPg2RdPeYW2YLPMnYt-rL_jLYlp_UR4JsgBu3Dd8a-slhOe8DRTf4MRtGu6yN15fOXDQ=="
+        "proof_value": "Sd-g01mOjNM5Rn4RDxSz3P5MpkHePzcVocDEugR4_QAnZcwDLBV_png_e7EUiUF0WpQsX0CiPOWqk9iLCKDaAg=="
       }
     },
     "verify_with": "agent_1",
@@ -2056,13 +2056,515 @@
         "created": "2026-02-14T12:00:00Z",
         "verification_method": "did:web:acme.com#keys-1",
         "proof_purpose": "assertionMethod",
-        "proof_value": "HwuOL6RQfoue9kDCY1bmRYnxqKc2oB41uSDsY2yiE1bGe_XSPBOk-3YzONOLs1KJbr1a5p6ozSowwjd5lfmcBA=="
+        "proof_value": "NYyN4DacDJ2CGvcfjJ1NSlrmyqbfSP6AJJ9hRHmRLiQdzgq8Th1Fum8UF-Ej8Lzcca5DDEejoNQ8Jpyw7w1VAg=="
       }
     },
     "verify_with": "agent_1",
     "expected": {
       "valid": true,
       "within_boundaries": true
+    }
+  },
+  "H01_float_normalization": {
+    "description": "Whole floats (500.0) MUST serialize as integers (500) in the canonical payload. This ensures Python/JS/Go produce identical bytes.",
+    "category": "serialization",
+    "envelope": {
+      "@context": "https://aip.protocol/v1",
+      "@type": "IntentEnvelope",
+      "protocol_version": "1.0.0",
+      "agent": {
+        "id": "did:web:acme.com:agents:procurement-bot",
+        "version": "1.0.0",
+        "runtime": "aip-sdk/0.1.0",
+        "attestation": {
+          "method": "self_reported",
+          "framework_id": null,
+          "build_hash": null,
+          "system_prompt_hash": null,
+          "registry_signature": null,
+          "intent_classifier": {
+            "model": "aip-classifier-v1",
+            "confidence_threshold": 0.95
+          }
+        }
+      },
+      "principal": {
+        "type": "organization",
+        "id": "did:web:acme.com",
+        "delegation_chain": [
+          {
+            "from": "did:web:acme.com",
+            "to": "did:web:acme.com:agents:procurement-bot",
+            "scope": "default",
+            "boundary_monotonicity": true,
+            "granted_at": "2026-01-01T00:00:00Z",
+            "expires_at": null
+          }
+        ]
+      },
+      "intent": {
+        "action": "transfer_funds",
+        "target": "did:web:vendor.com:agents:billing",
+        "parameters": {
+          "amount": 500.0,
+          "currency": "USD"
+        }
+      },
+      "boundaries": {
+        "allowed_actions": [
+          "transfer_funds",
+          "read_invoice"
+        ],
+        "denied_actions": [],
+        "monetary_limit": {
+          "per_transaction": 1000.0,
+          "per_day": 5000.0,
+          "currency": "USD"
+        },
+        "data_access": [],
+        "geo_restriction": null,
+        "time_window": null
+      },
+      "verification_tier": "tier_1",
+      "entropy": "nonce:0000000000000000000000000000001a",
+      "ttl": 300,
+      "issued_at": "2026-02-14T12:00:00Z",
+      "expires_at": null,
+      "proof": {
+        "type": "Ed25519Signature2020",
+        "created": "2026-02-14T12:00:00Z",
+        "verification_method": "did:web:acme.com#keys-1",
+        "proof_purpose": "assertionMethod",
+        "proof_value": "phvCWgk0rQM5q6sI1PpTnlwaePOMJZQMNtHKQhE3VNk6dJqarZ2-o_7xNWZ3vyp8eSxiPriUFCkTNf9deQAEDw=="
+      }
+    },
+    "verify_with": "agent_1",
+    "canonical_payload_hex": "7b2240636f6e74657874223a2268747470733a2f2f6169702e70726f746f636f6c2f7631222c224074797065223a22496e74656e74456e76656c6f7065222c226167656e74223a7b226174746573746174696f6e223a7b226275696c645f68617368223a6e756c6c2c226672616d65776f726b5f6964223a6e756c6c2c22696e74656e745f636c6173736966696572223a7b22636f6e666964656e63655f7468726573686f6c64223a302e39352c226d6f64656c223a226169702d636c61737369666965722d7631227d2c226d6574686f64223a2273656c665f7265706f72746564222c2272656769737472795f7369676e6174757265223a6e756c6c2c2273797374656d5f70726f6d70745f68617368223a6e756c6c7d2c226964223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74222c2272756e74696d65223a226169702d73646b2f302e312e30222c2276657273696f6e223a22312e302e30227d2c22626f756e646172696573223a7b22616c6c6f7765645f616374696f6e73223a5b227472616e736665725f66756e6473222c22726561645f696e766f696365225d2c22646174615f616363657373223a5b5d2c2264656e6965645f616374696f6e73223a5b5d2c2267656f5f7265737472696374696f6e223a6e756c6c2c226d6f6e65746172795f6c696d6974223a7b2263757272656e6379223a22555344222c227065725f646179223a353030302c227065725f7472616e73616374696f6e223a313030307d2c2274696d655f77696e646f77223a6e756c6c7d2c22656e74726f7079223a226e6f6e63653a3030303030303030303030303030303030303030303030303030303030303161222c22657870697265735f6174223a6e756c6c2c22696e74656e74223a7b22616374696f6e223a227472616e736665725f66756e6473222c22706172616d6574657273223a7b22616d6f756e74223a3530302c2263757272656e6379223a22555344227d2c22746172676574223a226469643a7765623a76656e646f722e636f6d3a6167656e74733a62696c6c696e67227d2c226973737565645f6174223a22323032362d30322d31345431323a30303a30305a222c227072696e636970616c223a7b2264656c65676174696f6e5f636861696e223a5b7b22626f756e646172795f6d6f6e6f746f6e6963697479223a747275652c22657870697265735f6174223a6e756c6c2c2266726f6d223a226469643a7765623a61636d652e636f6d222c226772616e7465645f6174223a22323032362d30312d30315430303a30303a30305a222c2273636f7065223a2264656661756c74222c22746f223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74227d5d2c226964223a226469643a7765623a61636d652e636f6d222c2274797065223a226f7267616e697a6174696f6e227d2c2270726f746f636f6c5f76657273696f6e223a22312e302e30222c2274746c223a3330302c22766572696669636174696f6e5f74696572223a22746965725f31227d",
+    "assertions": [
+      "canonical payload MUST contain '\"amount\":500,' NOT '\"amount\":500.0,'",
+      "canonical payload MUST contain '\"per_transaction\":1000' NOT '\"per_transaction\":1000.0'"
+    ],
+    "expected": {
+      "valid": true,
+      "signature_valid": true
+    }
+  },
+  "H02_decimal_preserved": {
+    "description": "Non-whole floats (45.5) MUST preserve their decimal in the canonical payload.",
+    "category": "serialization",
+    "envelope": {
+      "@context": "https://aip.protocol/v1",
+      "@type": "IntentEnvelope",
+      "protocol_version": "1.0.0",
+      "agent": {
+        "id": "did:web:acme.com:agents:procurement-bot",
+        "version": "1.0.0",
+        "runtime": "aip-sdk/0.1.0",
+        "attestation": {
+          "method": "self_reported",
+          "framework_id": null,
+          "build_hash": null,
+          "system_prompt_hash": null,
+          "registry_signature": null,
+          "intent_classifier": {
+            "model": "aip-classifier-v1",
+            "confidence_threshold": 0.95
+          }
+        }
+      },
+      "principal": {
+        "type": "organization",
+        "id": "did:web:acme.com",
+        "delegation_chain": [
+          {
+            "from": "did:web:acme.com",
+            "to": "did:web:acme.com:agents:procurement-bot",
+            "scope": "default",
+            "boundary_monotonicity": true,
+            "granted_at": "2026-01-01T00:00:00Z",
+            "expires_at": null
+          }
+        ]
+      },
+      "intent": {
+        "action": "transfer_funds",
+        "target": "did:web:vendor.com:agents:billing",
+        "parameters": {
+          "amount": 45.5,
+          "currency": "USD"
+        }
+      },
+      "boundaries": {
+        "allowed_actions": [
+          "transfer_funds",
+          "read_invoice"
+        ],
+        "denied_actions": [],
+        "monetary_limit": {
+          "per_transaction": 1000.0,
+          "per_day": 5000.0,
+          "currency": "USD"
+        },
+        "data_access": [],
+        "geo_restriction": null,
+        "time_window": null
+      },
+      "verification_tier": "tier_1",
+      "entropy": "nonce:0000000000000000000000000000001b",
+      "ttl": 300,
+      "issued_at": "2026-02-14T12:00:00Z",
+      "expires_at": null,
+      "proof": {
+        "type": "Ed25519Signature2020",
+        "created": "2026-02-14T12:00:00Z",
+        "verification_method": "did:web:acme.com#keys-1",
+        "proof_purpose": "assertionMethod",
+        "proof_value": "-mKCR6xP-AI5MnDiUIryk2PYpRjLWKA_7Ls2ahy19cHkJgLPxizVoqX6zNlBjpAg3E-znjktqK-W3Bb-svwUBQ=="
+      }
+    },
+    "verify_with": "agent_1",
+    "canonical_payload_hex": "7b2240636f6e74657874223a2268747470733a2f2f6169702e70726f746f636f6c2f7631222c224074797065223a22496e74656e74456e76656c6f7065222c226167656e74223a7b226174746573746174696f6e223a7b226275696c645f68617368223a6e756c6c2c226672616d65776f726b5f6964223a6e756c6c2c22696e74656e745f636c6173736966696572223a7b22636f6e666964656e63655f7468726573686f6c64223a302e39352c226d6f64656c223a226169702d636c61737369666965722d7631227d2c226d6574686f64223a2273656c665f7265706f72746564222c2272656769737472795f7369676e6174757265223a6e756c6c2c2273797374656d5f70726f6d70745f68617368223a6e756c6c7d2c226964223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74222c2272756e74696d65223a226169702d73646b2f302e312e30222c2276657273696f6e223a22312e302e30227d2c22626f756e646172696573223a7b22616c6c6f7765645f616374696f6e73223a5b227472616e736665725f66756e6473222c22726561645f696e766f696365225d2c22646174615f616363657373223a5b5d2c2264656e6965645f616374696f6e73223a5b5d2c2267656f5f7265737472696374696f6e223a6e756c6c2c226d6f6e65746172795f6c696d6974223a7b2263757272656e6379223a22555344222c227065725f646179223a353030302c227065725f7472616e73616374696f6e223a313030307d2c2274696d655f77696e646f77223a6e756c6c7d2c22656e74726f7079223a226e6f6e63653a3030303030303030303030303030303030303030303030303030303030303162222c22657870697265735f6174223a6e756c6c2c22696e74656e74223a7b22616374696f6e223a227472616e736665725f66756e6473222c22706172616d6574657273223a7b22616d6f756e74223a34352e352c2263757272656e6379223a22555344227d2c22746172676574223a226469643a7765623a76656e646f722e636f6d3a6167656e74733a62696c6c696e67227d2c226973737565645f6174223a22323032362d30322d31345431323a30303a30305a222c227072696e636970616c223a7b2264656c65676174696f6e5f636861696e223a5b7b22626f756e646172795f6d6f6e6f746f6e6963697479223a747275652c22657870697265735f6174223a6e756c6c2c2266726f6d223a226469643a7765623a61636d652e636f6d222c226772616e7465645f6174223a22323032362d30312d30315430303a30303a30305a222c2273636f7065223a2264656661756c74222c22746f223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74227d5d2c226964223a226469643a7765623a61636d652e636f6d222c2274797065223a226f7267616e697a6174696f6e227d2c2270726f746f636f6c5f76657273696f6e223a22312e302e30222c2274746c223a3330302c22766572696669636174696f6e5f74696572223a22746965725f31227d",
+    "assertions": [
+      "canonical payload MUST contain '\"amount\":45.5,' NOT '\"amount\":45,'"
+    ],
+    "expected": {
+      "valid": true,
+      "signature_valid": true
+    }
+  },
+  "H03_key_ordering": {
+    "description": "Keys MUST be sorted lexicographically at ALL nesting levels. '@context' MUST appear before '@type', 'agent' before 'boundaries', etc.",
+    "category": "serialization",
+    "envelope": {
+      "@context": "https://aip.protocol/v1",
+      "@type": "IntentEnvelope",
+      "protocol_version": "1.0.0",
+      "agent": {
+        "id": "did:web:acme.com:agents:procurement-bot",
+        "version": "1.0.0",
+        "runtime": "aip-sdk/0.1.0",
+        "attestation": {
+          "method": "self_reported",
+          "framework_id": null,
+          "build_hash": null,
+          "system_prompt_hash": null,
+          "registry_signature": null,
+          "intent_classifier": {
+            "model": "aip-classifier-v1",
+            "confidence_threshold": 0.95
+          }
+        }
+      },
+      "principal": {
+        "type": "organization",
+        "id": "did:web:acme.com",
+        "delegation_chain": [
+          {
+            "from": "did:web:acme.com",
+            "to": "did:web:acme.com:agents:procurement-bot",
+            "scope": "default",
+            "boundary_monotonicity": true,
+            "granted_at": "2026-01-01T00:00:00Z",
+            "expires_at": null
+          }
+        ]
+      },
+      "intent": {
+        "action": "transfer_funds",
+        "target": "did:web:vendor.com:agents:billing",
+        "parameters": {
+          "amount": 200.0,
+          "currency": "USD"
+        }
+      },
+      "boundaries": {
+        "allowed_actions": [
+          "transfer_funds",
+          "read_invoice"
+        ],
+        "denied_actions": [],
+        "monetary_limit": {
+          "per_transaction": 500.0,
+          "per_day": 5000.0,
+          "currency": "USD"
+        },
+        "data_access": [],
+        "geo_restriction": null,
+        "time_window": null
+      },
+      "verification_tier": "tier_1",
+      "entropy": "nonce:0000000000000000000000000000001c",
+      "ttl": 300,
+      "issued_at": "2026-02-14T12:00:00Z",
+      "expires_at": null,
+      "proof": {
+        "type": "Ed25519Signature2020",
+        "created": "2026-02-14T12:00:00Z",
+        "verification_method": "did:web:acme.com#keys-1",
+        "proof_purpose": "assertionMethod",
+        "proof_value": "nkKpcz5aYVk61ypI03IxzGxsuovYHosQ3z9pkbZsf3cdWIoqzlQXPDXX7kNYBabxc0AI0sBXDWZRGq1abyZsBg=="
+      }
+    },
+    "verify_with": "agent_1",
+    "canonical_payload_hex": "7b2240636f6e74657874223a2268747470733a2f2f6169702e70726f746f636f6c2f7631222c224074797065223a22496e74656e74456e76656c6f7065222c226167656e74223a7b226174746573746174696f6e223a7b226275696c645f68617368223a6e756c6c2c226672616d65776f726b5f6964223a6e756c6c2c22696e74656e745f636c6173736966696572223a7b22636f6e666964656e63655f7468726573686f6c64223a302e39352c226d6f64656c223a226169702d636c61737369666965722d7631227d2c226d6574686f64223a2273656c665f7265706f72746564222c2272656769737472795f7369676e6174757265223a6e756c6c2c2273797374656d5f70726f6d70745f68617368223a6e756c6c7d2c226964223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74222c2272756e74696d65223a226169702d73646b2f302e312e30222c2276657273696f6e223a22312e302e30227d2c22626f756e646172696573223a7b22616c6c6f7765645f616374696f6e73223a5b227472616e736665725f66756e6473222c22726561645f696e766f696365225d2c22646174615f616363657373223a5b5d2c2264656e6965645f616374696f6e73223a5b5d2c2267656f5f7265737472696374696f6e223a6e756c6c2c226d6f6e65746172795f6c696d6974223a7b2263757272656e6379223a22555344222c227065725f646179223a353030302c227065725f7472616e73616374696f6e223a3530307d2c2274696d655f77696e646f77223a6e756c6c7d2c22656e74726f7079223a226e6f6e63653a3030303030303030303030303030303030303030303030303030303030303163222c22657870697265735f6174223a6e756c6c2c22696e74656e74223a7b22616374696f6e223a227472616e736665725f66756e6473222c22706172616d6574657273223a7b22616d6f756e74223a3230302c2263757272656e6379223a22555344227d2c22746172676574223a226469643a7765623a76656e646f722e636f6d3a6167656e74733a62696c6c696e67227d2c226973737565645f6174223a22323032362d30322d31345431323a30303a30305a222c227072696e636970616c223a7b2264656c65676174696f6e5f636861696e223a5b7b22626f756e646172795f6d6f6e6f746f6e6963697479223a747275652c22657870697265735f6174223a6e756c6c2c2266726f6d223a226469643a7765623a61636d652e636f6d222c226772616e7465645f6174223a22323032362d30312d30315430303a30303a30305a222c2273636f7065223a2264656661756c74222c22746f223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74227d5d2c226964223a226469643a7765623a61636d652e636f6d222c2274797065223a226f7267616e697a6174696f6e227d2c2270726f746f636f6c5f76657273696f6e223a22312e302e30222c2274746c223a3330302c22766572696669636174696f6e5f74696572223a22746965725f31227d",
+    "assertions": [
+      "'@context' MUST appear before '@type' in canonical form",
+      "'agent' MUST appear before 'boundaries'",
+      "'boundaries' MUST appear before 'entropy'",
+      "Nested keys within 'agent' MUST also be sorted"
+    ],
+    "expected": {
+      "valid": true,
+      "signature_valid": true
+    }
+  },
+  "H04_datetime_format": {
+    "description": "Datetimes MUST be serialized as ISO 8601 with 'Z' suffix for UTC. Example: '2026-02-14T12:00:00Z' NOT '2026-02-14T12:00:00+00:00'.",
+    "category": "serialization",
+    "envelope": {
+      "@context": "https://aip.protocol/v1",
+      "@type": "IntentEnvelope",
+      "protocol_version": "1.0.0",
+      "agent": {
+        "id": "did:web:acme.com:agents:procurement-bot",
+        "version": "1.0.0",
+        "runtime": "aip-sdk/0.1.0",
+        "attestation": {
+          "method": "self_reported",
+          "framework_id": null,
+          "build_hash": null,
+          "system_prompt_hash": null,
+          "registry_signature": null,
+          "intent_classifier": {
+            "model": "aip-classifier-v1",
+            "confidence_threshold": 0.95
+          }
+        }
+      },
+      "principal": {
+        "type": "organization",
+        "id": "did:web:acme.com",
+        "delegation_chain": [
+          {
+            "from": "did:web:acme.com",
+            "to": "did:web:acme.com:agents:procurement-bot",
+            "scope": "default",
+            "boundary_monotonicity": true,
+            "granted_at": "2026-01-01T00:00:00Z",
+            "expires_at": null
+          }
+        ]
+      },
+      "intent": {
+        "action": "transfer_funds",
+        "target": "did:web:vendor.com:agents:billing",
+        "parameters": {
+          "amount": 200.0,
+          "currency": "USD"
+        }
+      },
+      "boundaries": {
+        "allowed_actions": [
+          "transfer_funds",
+          "read_invoice"
+        ],
+        "denied_actions": [],
+        "monetary_limit": {
+          "per_transaction": 500.0,
+          "per_day": 5000.0,
+          "currency": "USD"
+        },
+        "data_access": [],
+        "geo_restriction": null,
+        "time_window": null
+      },
+      "verification_tier": "tier_1",
+      "entropy": "nonce:0000000000000000000000000000001d",
+      "ttl": 300,
+      "issued_at": "2026-02-14T12:00:00Z",
+      "expires_at": null,
+      "proof": {
+        "type": "Ed25519Signature2020",
+        "created": "2026-02-14T12:00:00Z",
+        "verification_method": "did:web:acme.com#keys-1",
+        "proof_purpose": "assertionMethod",
+        "proof_value": "lCcWjTqSJRpGMNx8icIvUEqA6k0KMfN3fvXBj9Ej35cftHcghWCoZXtmSsx4Ue4bEGEC4UoMD0CJf6eMbPomCQ=="
+      }
+    },
+    "verify_with": "agent_1",
+    "canonical_payload_hex": "7b2240636f6e74657874223a2268747470733a2f2f6169702e70726f746f636f6c2f7631222c224074797065223a22496e74656e74456e76656c6f7065222c226167656e74223a7b226174746573746174696f6e223a7b226275696c645f68617368223a6e756c6c2c226672616d65776f726b5f6964223a6e756c6c2c22696e74656e745f636c6173736966696572223a7b22636f6e666964656e63655f7468726573686f6c64223a302e39352c226d6f64656c223a226169702d636c61737369666965722d7631227d2c226d6574686f64223a2273656c665f7265706f72746564222c2272656769737472795f7369676e6174757265223a6e756c6c2c2273797374656d5f70726f6d70745f68617368223a6e756c6c7d2c226964223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74222c2272756e74696d65223a226169702d73646b2f302e312e30222c2276657273696f6e223a22312e302e30227d2c22626f756e646172696573223a7b22616c6c6f7765645f616374696f6e73223a5b227472616e736665725f66756e6473222c22726561645f696e766f696365225d2c22646174615f616363657373223a5b5d2c2264656e6965645f616374696f6e73223a5b5d2c2267656f5f7265737472696374696f6e223a6e756c6c2c226d6f6e65746172795f6c696d6974223a7b2263757272656e6379223a22555344222c227065725f646179223a353030302c227065725f7472616e73616374696f6e223a3530307d2c2274696d655f77696e646f77223a6e756c6c7d2c22656e74726f7079223a226e6f6e63653a3030303030303030303030303030303030303030303030303030303030303164222c22657870697265735f6174223a6e756c6c2c22696e74656e74223a7b22616374696f6e223a227472616e736665725f66756e6473222c22706172616d6574657273223a7b22616d6f756e74223a3230302c2263757272656e6379223a22555344227d2c22746172676574223a226469643a7765623a76656e646f722e636f6d3a6167656e74733a62696c6c696e67227d2c226973737565645f6174223a22323032362d30322d31345431323a30303a30305a222c227072696e636970616c223a7b2264656c65676174696f6e5f636861696e223a5b7b22626f756e646172795f6d6f6e6f746f6e6963697479223a747275652c22657870697265735f6174223a6e756c6c2c2266726f6d223a226469643a7765623a61636d652e636f6d222c226772616e7465645f6174223a22323032362d30312d30315430303a30303a30305a222c2273636f7065223a2264656661756c74222c22746f223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74227d5d2c226964223a226469643a7765623a61636d652e636f6d222c2274797065223a226f7267616e697a6174696f6e227d2c2270726f746f636f6c5f76657273696f6e223a22312e302e30222c2274746c223a3330302c22766572696669636174696f6e5f74696572223a22746965725f31227d",
+    "assertions": [
+      "issued_at MUST end with 'Z' not '+00:00'",
+      "granted_at in delegation_chain MUST end with 'Z' not '+00:00'"
+    ],
+    "expected": {
+      "valid": true,
+      "signature_valid": true
+    }
+  },
+  "H05_null_handling": {
+    "description": "Null values MUST be serialized as JSON null, NOT omitted. Fields like 'expires_at':null MUST appear in canonical form.",
+    "category": "serialization",
+    "envelope": {
+      "@context": "https://aip.protocol/v1",
+      "@type": "IntentEnvelope",
+      "protocol_version": "1.0.0",
+      "agent": {
+        "id": "did:web:acme.com:agents:procurement-bot",
+        "version": "1.0.0",
+        "runtime": "aip-sdk/0.1.0",
+        "attestation": {
+          "method": "self_reported",
+          "framework_id": null,
+          "build_hash": null,
+          "system_prompt_hash": null,
+          "registry_signature": null,
+          "intent_classifier": {
+            "model": "aip-classifier-v1",
+            "confidence_threshold": 0.95
+          }
+        }
+      },
+      "principal": {
+        "type": "organization",
+        "id": "did:web:acme.com",
+        "delegation_chain": [
+          {
+            "from": "did:web:acme.com",
+            "to": "did:web:acme.com:agents:procurement-bot",
+            "scope": "default",
+            "boundary_monotonicity": true,
+            "granted_at": "2026-01-01T00:00:00Z",
+            "expires_at": null
+          }
+        ]
+      },
+      "intent": {
+        "action": "transfer_funds",
+        "target": "did:web:vendor.com:agents:billing",
+        "parameters": {
+          "amount": 200.0,
+          "currency": "USD"
+        }
+      },
+      "boundaries": {
+        "allowed_actions": [
+          "transfer_funds",
+          "read_invoice"
+        ],
+        "denied_actions": [],
+        "monetary_limit": {
+          "per_transaction": 500.0,
+          "per_day": 5000.0,
+          "currency": "USD"
+        },
+        "data_access": [],
+        "geo_restriction": null,
+        "time_window": null
+      },
+      "verification_tier": "tier_1",
+      "entropy": "nonce:0000000000000000000000000000001e",
+      "ttl": 300,
+      "issued_at": "2026-02-14T12:00:00Z",
+      "expires_at": null,
+      "proof": {
+        "type": "Ed25519Signature2020",
+        "created": "2026-02-14T12:00:00Z",
+        "verification_method": "did:web:acme.com#keys-1",
+        "proof_purpose": "assertionMethod",
+        "proof_value": "0-WZKinlmVOKNW9kQPkL_09aW1n3Qg4ANkMogeALeCr7QqD0YaEbPNyn93bXYfH28rK8aDuWncZFAtfPIonhAw=="
+      }
+    },
+    "verify_with": "agent_1",
+    "canonical_payload_hex": "7b2240636f6e74657874223a2268747470733a2f2f6169702e70726f746f636f6c2f7631222c224074797065223a22496e74656e74456e76656c6f7065222c226167656e74223a7b226174746573746174696f6e223a7b226275696c645f68617368223a6e756c6c2c226672616d65776f726b5f6964223a6e756c6c2c22696e74656e745f636c6173736966696572223a7b22636f6e666964656e63655f7468726573686f6c64223a302e39352c226d6f64656c223a226169702d636c61737369666965722d7631227d2c226d6574686f64223a2273656c665f7265706f72746564222c2272656769737472795f7369676e6174757265223a6e756c6c2c2273797374656d5f70726f6d70745f68617368223a6e756c6c7d2c226964223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74222c2272756e74696d65223a226169702d73646b2f302e312e30222c2276657273696f6e223a22312e302e30227d2c22626f756e646172696573223a7b22616c6c6f7765645f616374696f6e73223a5b227472616e736665725f66756e6473222c22726561645f696e766f696365225d2c22646174615f616363657373223a5b5d2c2264656e6965645f616374696f6e73223a5b5d2c2267656f5f7265737472696374696f6e223a6e756c6c2c226d6f6e65746172795f6c696d6974223a7b2263757272656e6379223a22555344222c227065725f646179223a353030302c227065725f7472616e73616374696f6e223a3530307d2c2274696d655f77696e646f77223a6e756c6c7d2c22656e74726f7079223a226e6f6e63653a3030303030303030303030303030303030303030303030303030303030303165222c22657870697265735f6174223a6e756c6c2c22696e74656e74223a7b22616374696f6e223a227472616e736665725f66756e6473222c22706172616d6574657273223a7b22616d6f756e74223a3230302c2263757272656e6379223a22555344227d2c22746172676574223a226469643a7765623a76656e646f722e636f6d3a6167656e74733a62696c6c696e67227d2c226973737565645f6174223a22323032362d30322d31345431323a30303a30305a222c227072696e636970616c223a7b2264656c65676174696f6e5f636861696e223a5b7b22626f756e646172795f6d6f6e6f746f6e6963697479223a747275652c22657870697265735f6174223a6e756c6c2c2266726f6d223a226469643a7765623a61636d652e636f6d222c226772616e7465645f6174223a22323032362d30312d30315430303a30303a30305a222c2273636f7065223a2264656661756c74222c22746f223a226469643a7765623a61636d652e636f6d3a6167656e74733a70726f637572656d656e742d626f74227d5d2c226964223a226469643a7765623a61636d652e636f6d222c2274797065223a226f7267616e697a6174696f6e227d2c2270726f746f636f6c5f76657273696f6e223a22312e302e30222c2274746c223a3330302c22766572696669636174696f6e5f74696572223a22746965725f31227d",
+    "assertions": [
+      "'expires_at':null MUST appear in canonical payload",
+      "null fields MUST NOT be omitted"
+    ],
+    "expected": {
+      "valid": true,
+      "signature_valid": true
+    }
+  },
+  "A05_short_nonce_rejected": {
+    "description": "A nonce shorter than 38 characters (6 prefix + 32 hex = 16 bytes entropy) MUST be rejected with AIP-E105.",
+    "category": "envelope_validity",
+    "envelope": {
+      "@context": "https://aip.protocol/v1",
+      "@type": "IntentEnvelope",
+      "protocol_version": "1.0.0",
+      "agent": {
+        "id": "did:web:acme.com:agents:procurement-bot",
+        "version": "1.0.0",
+        "runtime": "aip-sdk/0.1.0",
+        "attestation": {
+          "method": "self_reported",
+          "framework_id": null,
+          "build_hash": null,
+          "system_prompt_hash": null,
+          "registry_signature": null,
+          "intent_classifier": {
+            "model": "aip-classifier-v1",
+            "confidence_threshold": 0.95
+          }
+        }
+      },
+      "principal": {
+        "type": "organization",
+        "id": "did:web:acme.com",
+        "delegation_chain": [
+          {
+            "from": "did:web:acme.com",
+            "to": "did:web:acme.com:agents:procurement-bot",
+            "scope": "default",
+            "boundary_monotonicity": true,
+            "granted_at": "2026-01-01T00:00:00Z",
+            "expires_at": null
+          }
+        ]
+      },
+      "intent": {
+        "action": "transfer_funds",
+        "target": "did:web:vendor.com:agents:billing",
+        "parameters": {
+          "amount": 200.0,
+          "currency": "USD"
+        }
+      },
+      "boundaries": {
+        "allowed_actions": [
+          "transfer_funds",
+          "read_invoice"
+        ],
+        "denied_actions": [],
+        "monetary_limit": {
+          "per_transaction": 500.0,
+          "per_day": 5000.0,
+          "currency": "USD"
+        },
+        "data_access": [],
+        "geo_restriction": null,
+        "time_window": null
+      },
+      "verification_tier": "tier_1",
+      "entropy": "nonce:abc",
+      "ttl": 300,
+      "issued_at": "2026-02-14T12:00:00Z",
+      "expires_at": null,
+      "proof": {
+        "type": "Ed25519Signature2020",
+        "created": "2026-02-14T12:00:00Z",
+        "verification_method": "did:web:acme.com#keys-1",
+        "proof_purpose": "assertionMethod",
+        "proof_value": "ShgfbpmAYs-YNfL4caAlvwTVTH-yIp2lzGOf1WZzf0a_tiLnYvBSphiv3KUR7ifh6AKTir-D7cjb4jKBikhmCw=="
+      }
+    },
+    "verify_with": "agent_1",
+    "expected": {
+      "valid": false,
+      "errors": [
+        "AIP-E105"
+      ]
     }
   }
 }

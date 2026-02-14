@@ -42,6 +42,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from aip_protocol.models import IntentEnvelope, VerificationTier
 from aip_protocol.verification import verify_intent
 from aip_protocol.revocation import RevocationStore
+from aip_protocol.envelope import _get_signable_payload
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -226,6 +227,27 @@ def run_vector(
                 f"expected tier_used={expected['tier_used']}, "
                 f"got tier_used={result.tier_used.value}"
             )
+
+    # Check canonical payload (Category H — serialization tests)
+    if "canonical_payload_hex" in vector:
+        actual_payload = _get_signable_payload(envelope)
+        expected_hex = vector["canonical_payload_hex"]
+        actual_hex = actual_payload.hex()
+        if actual_hex != expected_hex:
+            # Find first difference
+            for i, (a, b) in enumerate(zip(actual_hex, expected_hex)):
+                if a != b:
+                    failures.append(
+                        f"canonical payload mismatch at byte {i//2}: "
+                        f"expected ...{expected_hex[max(0,i-10):i+10]}... "
+                        f"got ...{actual_hex[max(0,i-10):i+10]}..."
+                    )
+                    break
+            else:
+                failures.append(
+                    f"canonical payload length mismatch: "
+                    f"expected {len(expected_hex)//2} bytes, got {len(actual_hex)//2}"
+                )
 
     if failures:
         detail = "; ".join(failures)

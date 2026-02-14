@@ -21,6 +21,7 @@ class AIPErrorCode(str, Enum):
     REPLAY_DETECTED = "AIP-E102"
     SCHEMA_INVALID = "AIP-E103"
     VERSION_UNSUPPORTED = "AIP-E104"
+    NONCE_INVALID = "AIP-E105"
 
     # E2xx — Boundary Violations
     ACTION_NOT_ALLOWED = "AIP-E200"
@@ -55,6 +56,7 @@ ERROR_DESCRIPTIONS: dict[AIPErrorCode, str] = {
     AIPErrorCode.REPLAY_DETECTED: "Entropy nonce has been reused — possible replay attack",
     AIPErrorCode.SCHEMA_INVALID: "Envelope does not conform to AIP-1 schema",
     AIPErrorCode.VERSION_UNSUPPORTED: "Protocol version is not supported by this verifier",
+    AIPErrorCode.NONCE_INVALID: "Entropy nonce does not meet minimum format or length requirements (≥16 bytes)",
     AIPErrorCode.ACTION_NOT_ALLOWED: "Requested action is not in the agent's allowed_actions list",
     AIPErrorCode.ACTION_DENIED: "Requested action is explicitly in the agent's denied_actions list",
     AIPErrorCode.MONETARY_LIMIT: "Transaction amount exceeds per-transaction or per-day monetary limit",

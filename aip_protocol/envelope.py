@@ -108,13 +108,48 @@ def create_envelope(
     return envelope
 
 
+def _normalize_floats(obj: Any) -> Any:
+    """
+    Normalize floats for cross-language canonical serialization.
+
+    AIP-1 Canonical Rule:
+      - Whole floats (500.0) MUST serialize as integers (500)
+      - Non-whole floats (45.5) MUST serialize with minimal decimal places
+      - This matches JavaScript's JSON.stringify behavior (RFC 7159 §6)
+
+    Without this, Python serializes 500.0 → "500.0" while JavaScript
+    serializes 500.0 → "500". Different bytes = different signature = broken.
+    """
+    if isinstance(obj, dict):
+        return {k: _normalize_floats(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_normalize_floats(v) for v in obj]
+    elif isinstance(obj, float):
+        # If it's a whole number, convert to int for consistent serialization
+        if obj == int(obj) and not (obj != obj):  # NaN check
+            return int(obj)
+        return obj
+    return obj
+
+
 def _get_signable_payload(envelope: IntentEnvelope) -> bytes:
     """
     Extract the canonical signable payload from an envelope.
 
     We sign everything except the proof itself (which would be circular).
+
+    AIP-1 Canonical Serialization Rules:
+      1. Exclude the "proof" field (circular)
+      2. Normalize floats: whole numbers → integers (500.0 → 500)
+      3. Sort keys recursively (json.dumps sort_keys=True)
+      4. No whitespace (separators=(",", ":"))
+      5. Encode as UTF-8 bytes
+
+    These rules ensure byte-identical output across Python, JavaScript,
+    Go, Rust, and any other JSON implementation.
     """
     data = envelope.model_dump(mode="json", by_alias=True, exclude={"proof"})
+    data = _normalize_floats(data)
     canonical = json.dumps(data, sort_keys=True, separators=(",", ":"), default=str)
     return canonical.encode("utf-8")
 

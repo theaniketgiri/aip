@@ -13,3 +13,4 @@ export { getSignablePayload, getSignablePayloadHex } from "./canonical.js";
 export { verifyEd25519, verifyHmac, hexToBytes, bytesToHex } from "./crypto.js";
 export { RevocationStore } from "./revocation.js";
 export { verifyIntent, type VerifyOptions } from "./verification.js";
+export { MeshClient, type MeshEvent, type MeshRevokeResponse, type MeshStatusResponse } from "./mesh.js";

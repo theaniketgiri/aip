@@ -24,6 +24,7 @@ from aip_protocol.errors import AIPError, AIPErrorCode
 from aip_protocol.revocation import RevocationStore
 from aip_protocol.crypto import generate_keypair, hmac_sign, hmac_verify, generate_hmac_key
 from aip_protocol.shield import protect, protect_agent, shield, AIPViolation
+from aip_protocol.mesh import MeshClient
 
 __all__ = [
     "AgentPassport",
@@ -52,4 +53,6 @@ __all__ = [
     "protect_agent",
     "shield",
     "AIPViolation",
+    # Cloud mesh
+    "MeshClient",
 ]

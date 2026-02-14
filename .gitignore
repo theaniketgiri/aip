@@ -1,5 +1,6 @@
 # ── Commercial Product (PRIVATE — never push) ──
 kya_api/
+mesh/
 dashboard/
 *.pem
 Dockerfile

@@ -1,10 +1,10 @@
 # AIP Protocol — Agent Intent Protocol
 
-> **Proof of Intent for the Agentic Web** · [Live Dashboard](https://kya.synthexai.tech) · [API Docs](https://kya.synthexai.tech/api/health)
+> **Proof of Intent for the Agentic Web** · [Live Dashboard](https://aip.synthexai.tech) · [API Docs](https://aip.synthexai.tech/api/health)
 
 AIP-1 is a trustless, cross-platform protocol for verifying the identity, intent, and authorization boundaries of autonomous AI agents. Think of it as **OAuth + TLS, but for AI agents talking to each other**.
 
-Built by [KYA Labs](https://kya.synthexai.tech) — *Know Your Agent before it acts.*
+Built by [KYA Labs](https://aip.synthexai.tech) — *Know Your Agent before it acts.*
 
 ---
 
@@ -71,12 +71,12 @@ Don't want to self-host verification? Use our cloud API:
 
 ```bash
 # Get an API key
-curl -X POST https://kya.synthexai.tech/api/keys \
+curl -X POST https://aip.synthexai.tech/api/keys \
   -H "Content-Type: application/json" \
   -d '{"name": "my-app", "plan": "starter"}'
 
 # Verify an agent intent
-curl -X POST https://kya.synthexai.tech/api/verify \
+curl -X POST https://aip.synthexai.tech/api/verify \
   -H "X-API-Key: kya_YOUR_KEY_HERE" \
   -H "Content-Type: application/json" \
   -d '{"agent_id": "did:web:example.com:agents:my-bot", "action": "transfer_funds"}'
@@ -150,7 +150,7 @@ We're looking for **3 early partners** building multi-agent systems. You get:
 - Direct Slack channel with the team
 - Your feedback shapes the protocol
 
-**Interested?** Open an issue or reach out → [Dashboard](https://kya.synthexai.tech)
+**Interested?** Open an issue or reach out → [Dashboard](https://aip.synthexai.tech)
 
 ## License
 

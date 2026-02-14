@@ -2,8 +2,10 @@
 AIP Revocation Store — In-memory revocation tracking for agents.
 
 In production this would be backed by the Revocation Mesh (gossip protocol
-+ WebSocket hot path). For V1, we use an in-memory store that can be
-shared across verification calls.
++ WebSocket hot path). For V1, we use an in-memory store with:
+  - Hot path: REST push with freshness tracking
+  - Cold path: DB persistence for crash recovery
+  - Nonce replay detection with bounded cache
 """
 
 from __future__ import annotations
@@ -24,17 +26,75 @@ class RevocationRecord(NamedTuple):
 
 class RevocationStore:
     """
-    Thread-safe in-memory revocation store.
+    Thread-safe in-memory revocation store with freshness tracking.
 
-    In production, this would be backed by:
-    - Hot path: WebSocket push with ACK
-    - Cold path: Append-only CRDT ledger via gossip protocol
+    Tracks last_sync_time for revocation staleness checks (AIP-E501).
+    Supports rehydration from a database on startup.
     """
+
+    # Maximum nonce cache size to prevent unbounded memory growth
+    MAX_NONCE_CACHE = 100_000
 
     def __init__(self) -> None:
         self._revocations: dict[str, RevocationRecord] = {}
-        self._nonce_cache: set[str] = set()  # For replay detection
+        self._nonce_cache: set[str] = set()
         self._lock = Lock()
+        self._last_sync: datetime = datetime.now(timezone.utc)
+
+    @property
+    def last_sync_time(self) -> datetime:
+        """Last time revocation data was synced/updated."""
+        return self._last_sync
+
+    def touch_sync(self) -> None:
+        """Mark revocation data as freshly synced."""
+        self._last_sync = datetime.now(timezone.utc)
+
+    def rehydrate(self, records: list[dict]) -> int:
+        """
+        Reload revocation records from persistent storage (DB).
+        Call on startup to restore state after a crash/restart.
+
+        Args:
+            records: List of dicts with keys: agent_id, reason, revoked_by,
+                     revoked_at (ISO str), suspended_until (ISO str or None)
+
+        Returns:
+            Number of records loaded
+        """
+        loaded = 0
+        with self._lock:
+            for r in records:
+                revoked_at = r.get("revoked_at")
+                if isinstance(revoked_at, str):
+                    revoked_at = datetime.fromisoformat(revoked_at)
+                if revoked_at and revoked_at.tzinfo is None:
+                    revoked_at = revoked_at.replace(tzinfo=timezone.utc)
+
+                suspended_until = r.get("suspended_until")
+                if isinstance(suspended_until, str) and suspended_until:
+                    suspended_until = datetime.fromisoformat(suspended_until)
+                    if suspended_until.tzinfo is None:
+                        suspended_until = suspended_until.replace(tzinfo=timezone.utc)
+                    # Skip expired suspensions
+                    if datetime.now(timezone.utc) > suspended_until:
+                        continue
+                else:
+                    suspended_until = None
+
+                record = RevocationRecord(
+                    agent_id=r["agent_id"],
+                    reason=r.get("reason", "unknown"),
+                    revoked_at=revoked_at or datetime.now(timezone.utc),
+                    revoked_by=r.get("revoked_by", "system"),
+                    scope=r.get("scope", "global"),
+                    suspended_until=suspended_until,
+                )
+                self._revocations[r["agent_id"]] = record
+                loaded += 1
+
+            self._last_sync = datetime.now(timezone.utc)
+        return loaded
 
     def revoke(
         self,
@@ -54,6 +114,7 @@ class RevocationStore:
         )
         with self._lock:
             self._revocations[agent_id] = record
+            self._last_sync = datetime.now(timezone.utc)
         return record
 
     def suspend(
@@ -76,6 +137,7 @@ class RevocationStore:
         )
         with self._lock:
             self._revocations[agent_id] = record
+            self._last_sync = datetime.now(timezone.utc)
         return record
 
     def is_revoked(self, agent_id: str) -> bool:
@@ -112,6 +174,7 @@ class RevocationStore:
         with self._lock:
             if agent_id in self._revocations:
                 del self._revocations[agent_id]
+                self._last_sync = datetime.now(timezone.utc)
                 return True
             return False
 
@@ -126,6 +189,12 @@ class RevocationStore:
         with self._lock:
             if nonce in self._nonce_cache:
                 return False  # Replay detected
+            # Bound the cache to prevent unbounded memory growth
+            if len(self._nonce_cache) >= self.MAX_NONCE_CACHE:
+                # Evict oldest ~10% (set is unordered, so just discard some)
+                evict_count = self.MAX_NONCE_CACHE // 10
+                for _ in range(evict_count):
+                    self._nonce_cache.pop()
             self._nonce_cache.add(nonce)
             return True  # New nonce, OK
 

@@ -140,7 +140,7 @@ Not every intent needs full crypto. AIP auto-selects the verification tier:
 ```bash
 pip install -e ".[dev]"
 pytest tests/ -v
-# 38 tests, all passing
+# 63 tests, all passing
 ```
 
 ## Design Partners

@@ -102,3 +102,31 @@ def b64_to_public_key(b64: str) -> Ed25519PublicKey:
     """Deserialize public key from base64 string."""
     raw = base64.urlsafe_b64decode(b64)
     return Ed25519PublicKey.from_public_bytes(raw)
+
+
+# ── HMAC for Tier 0 fast-path ─────────────────────────────────────────────
+
+import hashlib
+import hmac as _hmac
+
+
+def generate_hmac_key() -> bytes:
+    """Generate a 256-bit HMAC key for Tier 0 fast-path verification."""
+    import os
+    return os.urandom(32)
+
+
+def hmac_sign(key: bytes, data: bytes) -> str:
+    """Create an HMAC-SHA256 over data, return base64-encoded."""
+    digest = _hmac.new(key, data, hashlib.sha256).digest()
+    return base64.urlsafe_b64encode(digest).decode("utf-8")
+
+
+def hmac_verify(key: bytes, data: bytes, signature_b64: str) -> bool:
+    """Verify an HMAC-SHA256 signature. Returns True if valid."""
+    try:
+        expected = _hmac.new(key, data, hashlib.sha256).digest()
+        provided = base64.urlsafe_b64decode(signature_b64)
+        return _hmac.compare_digest(expected, provided)
+    except Exception:
+        return False

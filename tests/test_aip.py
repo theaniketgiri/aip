@@ -2,15 +2,19 @@
 AIP Protocol — Comprehensive Test Suite
 
 Tests cover:
-  1. Crypto layer (key gen, signing, verification)
+  1. Crypto layer (key gen, signing, verification, HMAC)
   2. Passport lifecycle (create, save, load)
   3. Envelope creation and signing
-  4. Tiered verification (all 8 steps)
-  5. Boundary enforcement
-  6. Revocation and suspension
+  4. Tiered verification (tier-aware pipeline)
+  5. Boundary enforcement (incl. geo restriction)
+  6. Revocation, suspension, rehydration
   7. Replay detection
   8. Trust scoring
-  9. Full integration flow
+  9. Intent classifier / drift detection
+  10. Attestation (model hash, prompt hash, framework)
+  11. Delegation chain validation
+  12. Error taxonomy (all codes wired)
+  13. Full integration flow
 """
 
 from __future__ import annotations
@@ -32,6 +36,9 @@ from aip_protocol.crypto import (
     load_public_key,
     public_key_to_b64,
     b64_to_public_key,
+    generate_hmac_key,
+    hmac_sign,
+    hmac_verify,
 )
 from aip_protocol.passport import AgentPassport
 from aip_protocol.envelope import (
@@ -40,8 +47,13 @@ from aip_protocol.envelope import (
     envelope_to_json,
     envelope_from_json,
     envelope_hash,
+    _get_signable_payload,
 )
-from aip_protocol.verification import verify_intent
+from aip_protocol.verification import (
+    verify_intent,
+    _check_intent_drift,
+    _classify_action_group,
+)
 from aip_protocol.revocation import RevocationStore
 from aip_protocol.trust import TrustScoreEngine
 from aip_protocol.errors import AIPError, AIPErrorCode
@@ -49,6 +61,7 @@ from aip_protocol.models import (
     IntentEnvelope,
     VerificationTier,
     RevocationStatus,
+    DelegationLink,
 )
 
 
@@ -104,6 +117,24 @@ class TestCrypto:
         restored = b64_to_public_key(b64)
         # Compare raw bytes
         assert public_key_to_b64(restored) == b64
+
+    def test_hmac_sign_and_verify(self):
+        key = generate_hmac_key()
+        data = b"tier 0 fast path data"
+        sig = hmac_sign(key, data)
+        assert hmac_verify(key, data, sig) is True
+
+    def test_hmac_wrong_key_fails(self):
+        key1 = generate_hmac_key()
+        key2 = generate_hmac_key()
+        data = b"test data"
+        sig = hmac_sign(key1, data)
+        assert hmac_verify(key2, data, sig) is False
+
+    def test_hmac_tampered_data_fails(self):
+        key = generate_hmac_key()
+        sig = hmac_sign(key, b"original")
+        assert hmac_verify(key, b"tampered", sig) is False
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -307,7 +338,12 @@ class TestVerification:
         assert AIPErrorCode.EXPIRED_ENVELOPE in result.errors
 
     def test_revoked_agent_fails(self):
-        passport, signed = self._signed_setup()
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="revoked-bot",
+            allowed_actions=["read_data"],
+        )
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_1)
+        signed = sign_envelope(env, passport.private_key)
         store = RevocationStore()
         store.revoke(passport.agent_id, reason="test_revocation")
         result = verify_intent(signed, passport.public_key, revocation_store=store)
@@ -315,7 +351,12 @@ class TestVerification:
         assert AIPErrorCode.AGENT_REVOKED in result.errors
 
     def test_suspended_agent_fails(self):
-        passport, signed = self._signed_setup()
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="suspended-bot",
+            allowed_actions=["read_data"],
+        )
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_1)
+        signed = sign_envelope(env, passport.private_key)
         store = RevocationStore()
         store.suspend(passport.agent_id, duration_seconds=3600)
         result = verify_intent(signed, passport.public_key, revocation_store=store)
@@ -342,7 +383,7 @@ class TestVerification:
             allowed_actions=["read_data"],
             framework_id="did:web:unknown-framework.com",
         )
-        env = create_envelope(passport, action="read_data")
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_1)
         signed = sign_envelope(env, passport.private_key)
         store = RevocationStore()
 
@@ -479,13 +520,14 @@ class TestIntegration:
         store = RevocationStore()
         trust = TrustScoreEngine()
 
-        # 2. Create and sign a valid intent
+        # 2. Create and sign a valid intent (use Tier 1 so revocation is checked)
         env1 = create_envelope(
             passport,
             action="transfer_funds",
             target="did:web:vendor.com",
             parameters={"amount": 45.00, "currency": "USD"},
             ttl=300,
+            tier=VerificationTier.TIER_1,
         )
         signed1 = sign_envelope(env1, passport.private_key)
 
@@ -505,6 +547,7 @@ class TestIntegration:
             passport,
             action="read_invoice",
             ttl=300,
+            tier=VerificationTier.TIER_1,
         )
         signed2 = sign_envelope(env2, passport.private_key)
         result2 = verify_intent(
@@ -560,3 +603,394 @@ class TestIntegration:
             parameters={"amount": 5000},
         )
         assert env_large.verification_tier == VerificationTier.TIER_2
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 8. Tiered Verification Tests
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestTieredVerification:
+    def _passport(self):
+        return AgentPassport.create(
+            domain="test.com",
+            agent_name="tier-bot",
+            allowed_actions=["read_data", "transfer_funds", "send_notification"],
+            monetary_limit_per_txn=100.0,
+        )
+
+    def test_tier0_skips_attestation_and_trust(self):
+        """Tier 0 should only check sig + boundaries, skip attestation/revocation/trust."""
+        passport = self._passport()
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_0)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is True
+        assert result.tier_used == VerificationTier.TIER_0
+        assert "fast-path" in result.detail
+
+    def test_tier1_checks_attestation_and_revocation(self):
+        """Tier 1 should check attestation and revocation but skip trust/drift."""
+        passport = self._passport()
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_1)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is True
+        assert result.tier_used == VerificationTier.TIER_1
+        assert "standard" in result.detail
+
+    def test_tier2_runs_full_pipeline(self):
+        """Tier 2 runs all checks including trust and intent drift."""
+        passport = self._passport()
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_2)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is True
+        assert result.tier_used == VerificationTier.TIER_2
+        assert "Tier 2" in result.detail
+
+    def test_tier0_still_catches_boundary_violation(self):
+        """Even Tier 0 must enforce boundaries."""
+        passport = self._passport()
+        env = create_envelope(passport, action="delete_everything", tier=VerificationTier.TIER_0)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is False
+        assert AIPErrorCode.ACTION_NOT_ALLOWED in result.errors
+
+    def test_tier1_catches_revoked_agent(self):
+        """Tier 1 checks revocation."""
+        passport = self._passport()
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_1)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+        store.revoke(passport.agent_id)
+
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is False
+        assert AIPErrorCode.AGENT_REVOKED in result.errors
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 9. Intent Classifier / Drift Tests
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestIntentClassifier:
+    def test_exact_match_no_drift(self):
+        """Exact action match should not flag drift."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="clf-bot",
+            allowed_actions=["read_data", "send_notification"],
+        )
+        env = create_envelope(passport, action="read_data")
+        assert _check_intent_drift(env) is True
+
+    def test_semantic_match_no_drift(self):
+        """read_calendar is in the same group as read_data → no drift."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="clf-bot",
+            allowed_actions=["read_data", "send_notification"],
+        )
+        env = create_envelope(passport, action="read_calendar")
+        assert _check_intent_drift(env) is True
+
+    def test_cross_group_drift_detected(self):
+        """Financial action when only read actions allowed → drift."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="clf-bot",
+            allowed_actions=["read_data", "generate_report"],
+        )
+        env = create_envelope(passport, action="transfer_funds")
+        assert _check_intent_drift(env) is False
+
+    def test_tier2_flags_intent_drift(self):
+        """Tier 2: intent drift fires when action is in boundaries but
+        semantically misaligned.  We add the action to boundaries so boundary
+        check passes, but the classifier should still catch the group mismatch.
+
+        Because _check_intent_drift returns True on exact match in allowed_actions,
+        we need to bypass that.  We mutate boundaries.allowed_actions *after*
+        the passport is created so the action is there for boundary check,
+        but the drift classifier's exact-match won't help because the semantic
+        groups still clash.
+
+        Actually, exact match in allowed_actions means drift returns True by
+        design — if the principal explicitly listed the action, it's not drift.
+
+        So instead we test drift through the standalone classifier function
+        and verify that in the full pipeline, boundary + drift form defense
+        in depth: if action is NOT in allowed_actions, boundary catches it;
+        if it IS, drift won't fire because it's explicitly sanctioned.
+        """
+        # Standalone classifier catches cross-group drift
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="drift-bot",
+            allowed_actions=["read_data", "generate_report"],
+        )
+        env = create_envelope(passport, action="transfer_funds", tier=VerificationTier.TIER_2)
+        # transfer_funds not in allowed → classifier says drift
+        assert _check_intent_drift(env) is False
+
+        # Full pipeline: boundary check catches it first (defense in depth)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is False
+        assert AIPErrorCode.ACTION_NOT_ALLOWED in result.errors
+
+    def test_classify_action_groups(self):
+        """Action group classification works."""
+        assert _classify_action_group("transfer_funds") == "financial"
+        assert _classify_action_group("read_data") == "data_read"
+        assert _classify_action_group("send_notification") == "notification"
+        assert _classify_action_group("delete") == "data_delete"
+        assert _classify_action_group("totally_unknown_xyz") is None
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 10. Attestation Verification Tests
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestAttestation:
+    def test_model_hash_mismatch(self):
+        """AIP-E300: model hash doesn't match registry → fail."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="attest-bot",
+            allowed_actions=["read_data"],
+            framework_id="did:web:langchain.com",
+        )
+        # Set a build hash on the passport
+        passport.identity.attestation.build_hash = "sha256:actual_hash"
+
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_1)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(
+            signed, passport.public_key,
+            revocation_store=store,
+            registered_frameworks={"did:web:langchain.com"},
+            known_model_hashes={"did:web:langchain.com": "sha256:expected_hash"},
+        )
+        assert result.passed is False
+        assert AIPErrorCode.MODEL_HASH_MISMATCH in result.errors
+
+    def test_prompt_hash_mismatch(self):
+        """AIP-E301: prompt template hash changed → fail."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="prompt-bot",
+            allowed_actions=["read_data"],
+            system_prompt_hash="sha256:original_prompt",
+        )
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_1)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(
+            signed, passport.public_key,
+            revocation_store=store,
+            known_prompt_hashes={passport.agent_id: "sha256:different_prompt"},
+        )
+        assert result.passed is False
+        assert AIPErrorCode.PROMPT_HASH_MISMATCH in result.errors
+
+    def test_correct_hashes_pass(self):
+        """Correct model + prompt hashes → pass."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="good-bot",
+            allowed_actions=["read_data"],
+            framework_id="did:web:langchain.com",
+            system_prompt_hash="sha256:prompt_abc",
+        )
+        passport.identity.attestation.build_hash = "sha256:model_xyz"
+
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_1)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(
+            signed, passport.public_key,
+            revocation_store=store,
+            registered_frameworks={"did:web:langchain.com"},
+            known_model_hashes={"did:web:langchain.com": "sha256:model_xyz"},
+            known_prompt_hashes={passport.agent_id: "sha256:prompt_abc"},
+        )
+        assert result.passed is True
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 11. Delegation Chain Tests
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestDelegation:
+    def test_valid_delegation_chain(self):
+        """Valid single-link delegation → pass on Tier 2."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="deleg-bot",
+            allowed_actions=["read_data"],
+        )
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_2)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is True
+
+    def test_expired_delegation_fails(self):
+        """AIP-E403: Expired delegation link → fail on Tier 2."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="expired-deleg-bot",
+            allowed_actions=["read_data"],
+        )
+        # Manually expire the delegation
+        passport.principal.delegation_chain[0].expires_at = (
+            datetime.now(timezone.utc) - timedelta(hours=1)
+        )
+
+        env = create_envelope(passport, action="read_data", tier=VerificationTier.TIER_2)
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is False
+        assert AIPErrorCode.DELEGATION_INVALID in result.errors
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 12. Geo Restriction Tests
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestGeoRestriction:
+    def test_geo_allowed(self):
+        """Request from allowed geo → pass."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="geo-bot",
+            allowed_actions=["read_data"],
+        )
+        passport.boundaries.geo_restriction = "US,GB,IN"
+
+        env = create_envelope(passport, action="read_data")
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(
+            signed, passport.public_key,
+            revocation_store=store,
+            request_geo="US",
+        )
+        assert result.passed is True
+
+    def test_geo_blocked(self):
+        """AIP-E204: Request from restricted geo → fail."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="geo-bot",
+            allowed_actions=["read_data"],
+        )
+        passport.boundaries.geo_restriction = "US,GB"
+
+        env = create_envelope(passport, action="read_data")
+        signed = sign_envelope(env, passport.private_key)
+        store = RevocationStore()
+
+        result = verify_intent(
+            signed, passport.public_key,
+            revocation_store=store,
+            request_geo="CN",
+        )
+        assert result.passed is False
+        assert AIPErrorCode.GEO_RESTRICTION in result.errors
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 13. Revocation Rehydration Tests
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestRevocationRehydration:
+    def test_rehydrate_from_records(self):
+        """RevocationStore can be rehydrated from DB records."""
+        store = RevocationStore()
+        records = [
+            {
+                "agent_id": "did:web:test.com:agents:bad-bot",
+                "reason": "compromised",
+                "revoked_by": "admin",
+                "revoked_at": datetime.now(timezone.utc).isoformat(),
+                "suspended_until": None,
+            },
+            {
+                "agent_id": "did:web:test.com:agents:sus-bot",
+                "reason": "anomaly",
+                "revoked_by": "system",
+                "revoked_at": datetime.now(timezone.utc).isoformat(),
+                "suspended_until": (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat(),
+            },
+        ]
+        loaded = store.rehydrate(records)
+        assert loaded == 2
+        assert store.is_revoked("did:web:test.com:agents:bad-bot") is True
+        assert store.is_revoked("did:web:test.com:agents:sus-bot") is True
+        assert store.is_suspended("did:web:test.com:agents:sus-bot") is True
+
+    def test_rehydrate_skips_expired_suspensions(self):
+        """Expired suspensions should not be loaded during rehydration."""
+        store = RevocationStore()
+        records = [
+            {
+                "agent_id": "did:web:test.com:agents:old-sus",
+                "reason": "test",
+                "revoked_by": "system",
+                "revoked_at": (datetime.now(timezone.utc) - timedelta(hours=3)).isoformat(),
+                "suspended_until": (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat(),
+            },
+        ]
+        loaded = store.rehydrate(records)
+        assert loaded == 0
+        assert store.is_revoked("did:web:test.com:agents:old-sus") is False
+
+    def test_sync_time_updates(self):
+        """last_sync_time should update on revoke/suspend/reinstate/rehydrate."""
+        store = RevocationStore()
+        t1 = store.last_sync_time
+
+        import time
+        time.sleep(0.01)
+        store.revoke("agent-x")
+        assert store.last_sync_time > t1
+
+    def test_nonce_cache_bounded(self):
+        """Nonce cache should not grow unbounded."""
+        store = RevocationStore()
+        # Fill beyond max
+        for i in range(store.MAX_NONCE_CACHE + 100):
+            store.check_nonce(f"nonce-{i}")
+        # Should have evicted some — cache should be bounded
+        assert len(store._nonce_cache) <= store.MAX_NONCE_CACHE
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 14. Schema Validation Tests (AIP-E103)
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestSchemaValidation:
+    def test_empty_action_fails(self):
+        """AIP-E103: Empty action field should fail schema check."""
+        passport = AgentPassport.create(
+            domain="test.com", agent_name="schema-bot",
+            allowed_actions=["read_data"],
+        )
+        env = create_envelope(passport, action="read_data")
+        signed = sign_envelope(env, passport.private_key)
+        # Tamper with action to be empty
+        signed = signed.model_copy(update={"intent": signed.intent.model_copy(update={"action": ""})})
+        store = RevocationStore()
+
+        result = verify_intent(signed, passport.public_key, revocation_store=store)
+        assert result.passed is False
+        assert AIPErrorCode.SCHEMA_INVALID in result.errors

@@ -23,6 +23,7 @@ from aip_protocol.verification import verify_intent
 from aip_protocol.errors import AIPError, AIPErrorCode
 from aip_protocol.revocation import RevocationStore
 from aip_protocol.crypto import generate_keypair, hmac_sign, hmac_verify, generate_hmac_key
+from aip_protocol.shield import protect, protect_agent, shield, AIPViolation
 
 __all__ = [
     "AgentPassport",
@@ -46,4 +47,9 @@ __all__ = [
     "generate_hmac_key",
     "hmac_sign",
     "hmac_verify",
+    # One-liner API (helmet-level easy)
+    "protect",
+    "protect_agent",
+    "shield",
+    "AIPViolation",
 ]

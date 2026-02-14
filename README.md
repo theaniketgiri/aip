@@ -27,8 +27,8 @@ pip install aip-protocol
 Or from source:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/aip-protocol.git
-cd aip-protocol
+git clone https://github.com/theaniketgiri/aip.git
+cd aip
 pip install -e ".[dev]"
 ```
 

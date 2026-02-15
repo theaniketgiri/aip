@@ -2,6 +2,11 @@
 kya_api/
 mesh/
 dashboard/
+integrations/
+sdks/
+INTERNAL_README.md
+aip_protocol/mesh.py
+examples/06_langchain.py
 *.pem
 Dockerfile
 docker-compose.yml

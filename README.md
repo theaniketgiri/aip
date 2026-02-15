@@ -170,47 +170,47 @@ aip verify --envelope intent.json \
 aip revoke "did:web:yourco.com:agents:my-agent" --reason "compromised"
 ```
 
-## Hosted API
+## Shield — One-Liner Protection
 
-Self-host the verification engine, or use the managed cloud at [aip.synthexai.tech](https://aip.synthexai.tech):
+Shield is the **helmet.js for AI agents**. Wrap any function, class, or object with AIP verification in a single line:
 
-```bash
-curl -X POST https://aip.synthexai.tech/api/verify \
-  -H "X-API-Key: kya_YOUR_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent_id": "did:web:yourco.com:agents:my-bot",
-    "action": "transfer_funds",
-    "target": "did:web:vendor.com",
-    "parameters": {"amount": 45.00}
-  }'
+```python
+from aip_protocol import shield, shield_class, shield_object
+
+# Wrap a function — every call is verified before execution
+@shield(passport, allowed_actions=["transfer_funds"], monetary_limit=100.0)
+def send_payment(to: str, amount: float):
+    bank.transfer(to, amount)
+
+send_payment("vendor@acme.com", 45.00)  # ✓ Verified and executed
+send_payment("vendor@acme.com", 500.00) # ✗ AIP-E202: MONETARY_LIMIT
+
+# Wrap an entire class — all public methods get AIP protection
+@shield_class(passport)
+class TradingAgent:
+    def buy_stock(self, ticker, qty): ...
+    def sell_stock(self, ticker, qty): ...
+
+# Or patch an existing object at runtime
+agent = CrewAIAgent(...)
+shield_object(agent, passport)  # All methods now AIP-verified
 ```
 
-```json
-{
-  "verified": true,
-  "tier": "tier_1",
-  "signature_valid": true,
-  "within_boundaries": true,
-  "trust_score": 0.847,
-  "latency_ms": 3.21,
-  "errors": []
-}
-```
+## AIP Cloud
 
-Full API docs → [aip.synthexai.tech/docs](https://aip.synthexai.tech/docs)
+The open-source SDK handles local verification. For production multi-agent systems, [AIP Cloud](https://aip.synthexai.tech) adds:
 
-## Framework Compatibility
+| Capability | Why It Can't Be Local |
+|---|---|
+| **Revocation Mesh** | Can't kill an agent across 50 deployments without a central service |
+| **Persistent Trust Scores** | Trust history dies on restart, needs shared store |
+| **Cross-Org Replay Detection** | Nonce cache is per-process — two companies can't share locally |
+| **Compliance Audit Log** | SOC2/HIPAA needs immutable logs, local SQLite doesn't count |
+| **Agent Identity Registry** | DNS for agents — `did:web:acme.com:agents:bot` needs a registry |
+| **Framework Adapters** | Production CrewAI, LangChain, AutoGen with managed infrastructure |
+| **Dashboard** | Real-time monitoring, kill switch, debugger |
 
-AIP is framework-agnostic. It works with any agent runtime:
-
-| Framework | Status | Notes |
-|---|---|---|
-| LangChain / LangGraph | ✅ Supported | Framework attestation via `framework_id` |
-| AutoGPT | ✅ Supported | Boundary enforcement on plugin calls |
-| CrewAI | ✅ Supported | Per-agent passport, shared trust mesh |
-| Custom Python agents | ✅ Supported | Any agent can create a passport |
-| OpenAI Assistants | 🔜 Planned | Function-call boundary mapping |
+→ **[Free tier available — aip.synthexai.tech](https://aip.synthexai.tech)**
 
 ## Development
 
@@ -229,6 +229,7 @@ aip_protocol/
 ├── passport.py       # Agent identity + Ed25519 key management
 ├── envelope.py       # Intent envelope creation + signing
 ├── verification.py   # 8-step verification pipeline + intent classifier
+├── shield.py         # One-liner AIP protection (helmet.js for AI)
 ├── crypto.py         # Ed25519 + HMAC cryptographic layer
 ├── errors.py         # AIP-Exxx error taxonomy (22 structured codes)
 ├── revocation.py     # Real-time revocation store with rehydration
@@ -239,11 +240,12 @@ aip_protocol/
 
 ## Design Partners
 
-We're onboarding **early design partners** building multi-agent systems. Partners get:
+We're onboarding **early design partners** building multi-agent systems in production. Partners get:
 
 - Enterprise-tier API access (free during beta)
-- Direct engineering support
+- Direct engineering support from the core team
 - Protocol roadmap influence
+- Priority access to framework adapters
 
 → **[Apply at aip.synthexai.tech](https://aip.synthexai.tech)**
 

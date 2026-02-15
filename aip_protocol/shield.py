@@ -26,7 +26,9 @@ If your setup takes more than 2 lines, we failed.
 from __future__ import annotations
 
 import functools
+import inspect
 import logging
+import warnings
 from typing import Any, Callable, TypeVar, overload
 
 from aip_protocol.envelope import create_envelope, sign_envelope
@@ -36,6 +38,62 @@ from aip_protocol.revocation import RevocationStore
 from aip_protocol.verification import verify_intent
 
 logger = logging.getLogger("aip.shield")
+
+# Known valid kwargs for each API — used for error messages
+_PROTECT_VALID_KWARGS = {
+    "actions", "denied", "limit", "daily_limit", "currency", "domain",
+    "agent_name", "geo", "tier", "on_violation", "passport", "store",
+}
+_SHIELD_VALID_KWARGS = {
+    "actions", "denied", "limit", "daily_limit", "currency", "domain",
+    "agent_name", "geo", "tier", "on_violation",
+}
+# Deprecated kwargs → what to use instead
+_DEPRECATED_KWARGS = {
+    "allowed_actions": "actions",
+    "denied_actions": "denied",
+    "monetary_limit": "limit",
+    "monetary_limit_per_txn": "limit",
+    "monetary_limit_per_day": "daily_limit",
+    "max_amount": "limit",
+    "boundary": "Use 'actions' and 'limit' directly",
+    "boundaries": "Use 'actions' and 'limit' directly",
+}
+
+
+def _check_kwargs(func_name: str, kwargs: dict, valid: set) -> None:
+    """Check for deprecated or invalid kwargs and emit helpful messages."""
+    for key in list(kwargs.keys()):
+        if key in _DEPRECATED_KWARGS:
+            replacement = _DEPRECATED_KWARGS[key]
+            warnings.warn(
+                f"aip-protocol: '{key}' is deprecated in {func_name}(). "
+                f"Use '{replacement}' instead. "
+                f"See: https://aip.synthexai.tech/docs#shield",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+        elif key not in valid:
+            valid_list = ", ".join(sorted(valid))
+            raise TypeError(
+                f"aip-protocol: {func_name}() got unexpected keyword argument '{key}'. "
+                f"Valid arguments: {valid_list}. "
+                f"See: https://aip.synthexai.tech/docs#shield"
+            )
+
+
+def _auto_agent_name(agent_name: str | None, fallback: Any) -> str:
+    """Auto-detect agent name from class, function, or module."""
+    if agent_name:
+        return agent_name
+    # Try class name
+    if isinstance(fallback, type):
+        return fallback.__name__
+    # Try function name
+    if callable(fallback):
+        return getattr(fallback, "__name__", None) or "unknown_agent"
+    # Try type name for instances
+    return type(fallback).__name__
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -161,12 +219,13 @@ def protect(
         ProtectedAgent that verifies before executing
     """
     func_name = getattr(func, "__name__", "unknown_action")
+    resolved_name = _auto_agent_name(agent_name, func)
     action_list = actions or [func_name]
 
     if passport is None:
         passport = AgentPassport.create(
             domain=domain,
-            agent_name=agent_name or func_name,
+            agent_name=resolved_name,
             allowed_actions=action_list,
             denied_actions=denied or [],
             monetary_limit_per_txn=limit,
@@ -221,6 +280,7 @@ def shield(
     """
     def decorator(cls: type) -> type:
         original_init = cls.__init__
+        resolved_name = _auto_agent_name(agent_name, cls)
 
         def new_init(self, *args: Any, **kwargs: Any) -> None:
             original_init(self, *args, **kwargs)
@@ -233,7 +293,7 @@ def shield(
 
             passport = AgentPassport.create(
                 domain=domain,
-                agent_name=agent_name or cls.__name__,
+                agent_name=resolved_name,
                 allowed_actions=all_actions,
                 denied_actions=denied or [],
                 monetary_limit_per_txn=limit,
@@ -309,6 +369,7 @@ def protect_agent(
     Returns:
         The same agent instance, with all public methods AIP-protected.
     """
+    resolved_name = _auto_agent_name(agent_name, agent)
     all_actions = actions or [
         name for name in dir(agent)
         if not name.startswith("_") and callable(getattr(agent, name))
@@ -316,7 +377,7 @@ def protect_agent(
 
     passport = AgentPassport.create(
         domain=domain,
-        agent_name=agent_name or type(agent).__name__,
+        agent_name=resolved_name,
         allowed_actions=all_actions,
         denied_actions=denied or [],
         monetary_limit_per_txn=limit,
@@ -345,3 +406,8 @@ def protect_agent(
             setattr(agent, name, protected)
 
     return agent
+
+
+# Aliases for discoverability
+shield_class = shield  # @shield_class(actions=[...]) — same as @shield
+shield_object = protect_agent  # shield_object(agent, ...) — same as protect_agent

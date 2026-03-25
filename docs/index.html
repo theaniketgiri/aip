@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIP — Agent Intent Protocol | The HTTPS for AI Agents</title>
+    <meta name="description" content="AIP is the open-source cryptographic identity, intent verification, and kill switch protocol for AI agents. Sub-millisecond verification. Framework-agnostic. Production-ready.">
+    <meta name="keywords" content="AIP, Agent Intent Protocol, AI agent security, cryptographic identity, kill switch, LangChain security, CrewAI security, agent verification, Ed25519, intent verification">
+    <meta name="author" content="Aniket Giri">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="AIP — Agent Intent Protocol">
+    <meta property="og:description" content="Cryptographic identity, intent verification, and kill switch for AI agents. The HTTPS for the agentic web.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://theaniketgiri.github.io/aip">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AIP — Agent Intent Protocol">
+    <meta name="twitter:description" content="Cryptographic identity, intent verification, and kill switch for AI agents.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #08090d;
+            --bg-secondary: #0f1117;
+            --bg-card: #151821;
+            --bg-card-hover: #1a1e2b;
+            --border: #1e2230;
+            --border-glow: #34d39933;
+            --text-primary: #e8eaf0;
+            --text-secondary: #8b92a5;
+            --text-dim: #5a6178;
+            --accent-green: #34d399;
+            --accent-green-dim: #34d39920;
+            --accent-purple: #a78bfa;
+            --accent-purple-dim: #a78bfa20;
+            --accent-blue: #60a5fa;
+            --accent-blue-dim: #60a5fa20;
+            --accent-red: #f87171;
+            --accent-red-dim: #f8717120;
+            --accent-yellow: #fbbf24;
+            --gradient-green: linear-gradient(135deg, #34d399, #059669);
+            --gradient-purple: linear-gradient(135deg, #a78bfa, #7c3aed);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background grid effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(52, 211, 153, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52, 211, 153, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(8, 9, 13, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--accent-green);
+            text-decoration: none;
+        }
+
+        .nav-logo span {
+            color: var(--text-dim);
+            font-weight: 400;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text-primary); }
+
+        .nav-cta {
+            background: var(--accent-green) !important;
+            color: var(--bg-primary) !important;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.3);
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            padding: 180px 40px 120px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: var(--accent-green-dim);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent-green);
+            margin-bottom: 32px;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 7vw, 80px);
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            background: var(--gradient-green);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 48px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.25s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(52, 211, 153, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-green);
+            background: var(--bg-card-hover);
+        }
+
+        .hero-install {
+            margin-top: 48px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .hero-install code {
+            color: var(--accent-green);
+        }
+
+        .hero-install button {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .hero-install button:hover { color: var(--accent-green); }
+
+        /* Section */
+        section {
+            position: relative;
+            padding: 100px 40px;
+            z-index: 1;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-header h2 {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* Problem Section */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .problem-card {
+            padding: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .problem-card:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(248, 113, 113, 0.08);
+        }
+
+        .problem-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .problem-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--accent-red);
+        }
+
+        .problem-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Capabilities */
+        .cap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .cap-card {
+            padding: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .cap-card:hover {
+            border-color: rgba(52, 211, 153, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(52, 211, 153, 0.06);
+        }
+
+        .cap-label {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .cap-label-green { background: var(--accent-green-dim); color: var(--accent-green); }
+        .cap-label-purple { background: var(--accent-purple-dim); color: var(--accent-purple); }
+        .cap-label-blue { background: var(--accent-blue-dim); color: var(--accent-blue); }
+        .cap-label-red { background: var(--accent-red-dim); color: var(--accent-red); }
+
+        .cap-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cap-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Pipeline Section */
+        .pipeline-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .pipeline-steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .pipeline-step {
+            text-align: center;
+            padding: 24px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .pipeline-step:hover {
+            border-color: rgba(52, 211, 153, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .pipeline-step h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .pipeline-step p {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* Code Block */
+        .code-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .code-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .code-dot-red { background: #f87171; }
+        .code-dot-yellow { background: #fbbf24; }
+        .code-dot-green { background: #34d399; }
+
+        .code-title {
+            margin-left: 8px;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .code-block pre {
+            padding: 24px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .code-block .kw { color: var(--accent-purple); }
+        .code-block .fn { color: var(--accent-blue); }
+        .code-block .str { color: var(--accent-green); }
+        .code-block .comment { color: var(--text-dim); }
+        .code-block .var { color: var(--accent-yellow); }
+
+        /* Tiers */
+        .tiers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tier-card {
+            padding: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .tier-card:hover {
+            border-color: rgba(52, 211, 153, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .tier-speed {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--accent-green);
+            margin-bottom: 4px;
+        }
+
+        .tier-name {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .tier-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Frameworks */
+        .fw-logos {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .fw-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .fw-logo:hover {
+            border-color: rgba(52, 211, 153, 0.3);
+            transform: translateY(-4px);
+            color: var(--text-primary);
+        }
+
+        .fw-icon {
+            font-size: 32px;
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 120px 40px;
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-section h2 {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+        }
+
+        .cta-section h2 em {
+            font-style: normal;
+            background: var(--gradient-green);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 13px;
+            position: relative;
+            z-index: 1;
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        footer a:hover { color: var(--accent-green); }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav { padding: 12px 20px; }
+            .nav-links { display: none; }
+            .hero { padding: 140px 20px 80px; }
+            section { padding: 60px 20px; }
+            .pipeline-steps { grid-template-columns: repeat(2, 1fr); }
+            .tiers { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Nav -->
+    <nav>
+        <a href="#" class="nav-logo">AIP <span>Agent Intent Protocol</span></a>
+        <ul class="nav-links">
+            <li><a href="#problem">Problem</a></li>
+            <li><a href="#solution">Solution</a></li>
+            <li><a href="#pipeline">Pipeline</a></li>
+            <li><a href="#code">Quick Start</a></li>
+            <li><a href="#frameworks">Frameworks</a></li>
+            <li><a href="https://github.com/theaniketgiri/aip" class="nav-cta">GitHub →</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-badge">Open Source · Production Ready</div>
+        <h1>The <em>HTTPS</em> for<br>AI Agents</h1>
+        <p class="hero-sub">
+            Cryptographic identity, intent verification, and instant kill switch for autonomous AI agents. Sub-millisecond. Framework-agnostic. Zero network calls.
+        </p>
+        <div class="hero-actions">
+            <a href="https://github.com/theaniketgiri/aip" class="btn btn-primary">
+                ⭐ Star on GitHub
+            </a>
+            <a href="https://korven.cc" class="btn btn-secondary">
+                Live Demo →
+            </a>
+        </div>
+        <div class="hero-install">
+            <span>$</span>
+            <code>pip install aip-protocol</code>
+            <button onclick="navigator.clipboard.writeText('pip install aip-protocol')">📋</button>
+        </div>
+    </section>
+
+    <!-- Problem -->
+    <section id="problem">
+        <div class="section-header">
+            <h2>The Problem</h2>
+            <p>Every AI framework lets agents do things. None of them verify what agents are allowed to do.</p>
+        </div>
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="problem-icon">🎭</div>
+                <h3>No Identity</h3>
+                <p>Agents have no cryptographic identity. There's no mathematical proof of which agent is performing an action. Any agent can impersonate any other.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">🔓</div>
+                <h3>No Boundaries</h3>
+                <p>A LangChain agent can drain a bank account. A CrewAI agent can delete production data. There's no protocol-level enforcement of what an agent is allowed to do.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">💀</div>
+                <h3>No Kill Switch</h3>
+                <p>If an agent goes rogue — prompt injection, hallucination, or exploit — there is no way to instantly revoke its access across all tools and systems in real-time.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution -->
+    <section id="solution">
+        <div class="section-header">
+            <h2>AIP Fixes This</h2>
+            <p>One protocol. Every agent. Cryptographic proof before every action.</p>
+        </div>
+        <div class="cap-grid">
+            <div class="cap-card">
+                <span class="cap-label cap-label-green">Identity</span>
+                <h3>Agent Passports</h3>
+                <p>Ed25519 keypair per agent with DID-based addressing. Identity is mathematical, not prompt-based. Tamper-proof and auditable.</p>
+            </div>
+            <div class="cap-card">
+                <span class="cap-label cap-label-purple">Verification</span>
+                <h3>Signed Intent Envelopes</h3>
+                <p>Before every action, the agent signs: "I am X, doing Y, at time T." The receiving system verifies the signature cryptographically.</p>
+            </div>
+            <div class="cap-card">
+                <span class="cap-label cap-label-blue">Boundaries</span>
+                <h3>The Cage</h3>
+                <p>Action allowlists, deny lists, monetary limits per transaction, geo restrictions. Enforced deterministically at the protocol layer.</p>
+            </div>
+            <div class="cap-card">
+                <span class="cap-label cap-label-red">Kill Switch</span>
+                <h3>Instant Revocation</h3>
+                <p>Revoke any agent globally with zero propagation delay. Once revoked, every tool call fails verification. Sub-millisecond. No network.</p>
+            </div>
+            <div class="cap-card">
+                <span class="cap-label cap-label-green">Trust</span>
+                <h3>Bayesian Trust Scores</h3>
+                <p>Trust is earned over successful verifications. New agents start untrusted. Anomalous behavior degrades trust automatically.</p>
+            </div>
+            <div class="cap-card">
+                <span class="cap-label cap-label-purple">Detection</span>
+                <h3>Intent Drift</h3>
+                <p>Semantic classifier flags actions outside an agent's declared scope. Catches subtle boundary violations that rule systems miss.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline -->
+    <section id="pipeline">
+        <div class="section-header">
+            <h2>8-Step Verification Pipeline</h2>
+            <p>Every intent passes through a rigorous pipeline. The protocol auto-selects the tier based on risk.</p>
+        </div>
+        <div class="pipeline-container">
+            <div class="pipeline-steps">
+                <div class="pipeline-step">
+                    <div class="step-num">1</div>
+                    <h4>Version Check</h4>
+                    <p>Protocol version</p>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">2</div>
+                    <h4>Schema</h4>
+                    <p>Envelope structure</p>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">3</div>
+                    <h4>Expiry</h4>
+                    <p>Timestamp + TTL</p>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">4</div>
+                    <h4>Boundaries</h4>
+                    <p>Actions + limits</p>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">5</div>
+                    <h4>Attestation</h4>
+                    <p>Ed25519 signature</p>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">6</div>
+                    <h4>Revocation</h4>
+                    <p>Kill switch check</p>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">7</div>
+                    <h4>Trust Score</h4>
+                    <p>Bayesian evaluation</p>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">8</div>
+                    <h4>Verdict</h4>
+                    <p>Allow or deny</p>
+                </div>
+            </div>
+            <div class="tiers">
+                <div class="tier-card">
+                    <div class="tier-speed">&lt;1ms</div>
+                    <div class="tier-name">Tier 0</div>
+                    <div class="tier-desc">Low-risk, cached, in-session repeats. HMAC + boundary proof.</div>
+                </div>
+                <div class="tier-card">
+                    <div class="tier-speed">~5ms</div>
+                    <div class="tier-name">Tier 1</div>
+                    <div class="tier-desc">Normal operations. Ed25519 + boundary + revocation check.</div>
+                </div>
+                <div class="tier-card">
+                    <div class="tier-speed">~50ms</div>
+                    <div class="tier-name">Tier 2</div>
+                    <div class="tier-desc">High-value, cross-org, first contact. Full 8-step pipeline.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code -->
+    <section id="code">
+        <div class="section-header">
+            <h2>Quick Start</h2>
+            <p>Protect your first agent in 30 seconds.</p>
+        </div>
+        <div class="code-section">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dot code-dot-red"></div>
+                    <div class="code-dot code-dot-yellow"></div>
+                    <div class="code-dot code-dot-green"></div>
+                    <span class="code-title">quickstart.py</span>
+                </div>
+                <pre>
+<span class="kw">from</span> aip_protocol <span class="kw">import</span> AgentPassport, create_envelope, sign_envelope, verify_intent
+<span class="kw">from</span> aip_protocol.revocation <span class="kw">import</span> RevocationStore
+
+<span class="comment"># 1 — Create an agent passport (identity + keys + boundaries)</span>
+<span class="var">passport</span> = AgentPassport.<span class="fn">create</span>(
+    domain=<span class="str">"yourco.com"</span>,
+    agent_name=<span class="str">"procurement-bot"</span>,
+    allowed_actions=[<span class="str">"read_invoice"</span>, <span class="str">"transfer_funds"</span>],
+    monetary_limit_per_txn=<span class="var">50.0</span>,
+)
+
+<span class="comment"># 2 — Agent declares intent before acting</span>
+<span class="var">envelope</span> = <span class="fn">create_envelope</span>(
+    passport, action=<span class="str">"transfer_funds"</span>,
+    target=<span class="str">"did:web:vendor.com"</span>,
+    parameters={<span class="str">"amount"</span>: <span class="var">45.00</span>},
+)
+<span class="var">signed</span> = <span class="fn">sign_envelope</span>(envelope, passport.private_key)
+
+<span class="comment"># 3 — Verify through the 8-step pipeline</span>
+<span class="var">store</span> = RevocationStore()
+<span class="var">result</span> = <span class="fn">verify_intent</span>(signed, passport.public_key, revocation_store=store)
+
+<span class="kw">if</span> result.passed:
+    <span class="fn">print</span>(<span class="str">f"✓ Verified — tier: {result.tier_used.value}"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">f"✗ Blocked — {result.errors}"</span>)
+    <span class="comment"># → "✗ AIP-E202: MONETARY_LIMIT"</span>
+</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Frameworks -->
+    <section id="frameworks">
+        <div class="section-header">
+            <h2>Works With Any Framework</h2>
+            <p>AIP is framework-agnostic. One decorator protects any tool.</p>
+        </div>
+        <div class="fw-logos">
+            <a href="https://github.com/theaniketgiri/aip/tree/main/demos/langchain_protected_tools" class="fw-logo">
+                <span class="fw-icon">🦜</span>
+                LangChain
+            </a>
+            <a href="https://github.com/theaniketgiri/aip/tree/main/demos/crewai_financial_compliance" class="fw-logo">
+                <span class="fw-icon">👥</span>
+                CrewAI
+            </a>
+            <a href="#" class="fw-logo">
+                <span class="fw-icon">🔷</span>
+                Google ADK
+            </a>
+            <a href="#" class="fw-logo">
+                <span class="fw-icon">🤖</span>
+                AutoGen
+            </a>
+            <a href="#" class="fw-logo">
+                <span class="fw-icon">🐍</span>
+                Any Python
+            </a>
+        </div>
+        <div class="code-section">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dot code-dot-red"></div>
+                    <div class="code-dot code-dot-yellow"></div>
+                    <div class="code-dot code-dot-green"></div>
+                    <span class="code-title">one_liner.py</span>
+                </div>
+                <pre>
+<span class="kw">from</span> aip_protocol <span class="kw">import</span> shield
+
+<span class="comment"># One decorator. Any function. Cryptographic verification.</span>
+<span class="kw">@</span><span class="fn">shield</span>(passport, allowed_actions=[<span class="str">"transfer_funds"</span>], monetary_limit=<span class="var">500.0</span>)
+<span class="kw">def</span> <span class="fn">send_payment</span>(to: str, amount: float):
+    bank.<span class="fn">transfer</span>(to, amount)
+
+<span class="fn">send_payment</span>(<span class="str">"vendor@acme.com"</span>, <span class="var">45.00</span>)   <span class="comment"># ✓ Verified</span>
+<span class="fn">send_payment</span>(<span class="str">"vendor@acme.com"</span>, <span class="var">500.00</span>)  <span class="comment"># ✗ AIP-E202: MONETARY_LIMIT</span>
+</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h2>Know Your Agent<br><em>Before It Acts</em></h2>
+        <p>Open-source. MIT Licensed. Production-ready.</p>
+        <div class="hero-actions">
+            <a href="https://github.com/theaniketgiri/aip" class="btn btn-primary">
+                View on GitHub →
+            </a>
+            <a href="https://pypi.org/project/aip-protocol/" class="btn btn-secondary">
+                PyPI Package
+            </a>
+            <a href="https://korven.cc" class="btn btn-secondary">
+                Live Dashboard
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="https://github.com/theaniketgiri/aip">GitHub</a>
+            <a href="https://pypi.org/project/aip-protocol/">PyPI</a>
+            <a href="https://korven.cc">Korven</a>
+            <a href="https://github.com/theaniketgiri/aip/issues">Issues</a>
+        </div>
+        <p>AIP — Agent Intent Protocol · Built by <a href="https://github.com/theaniketgiri">Aniket Giri</a> · MIT License</p>
+    </footer>
+
+</body>
+</html>

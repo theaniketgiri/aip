@@ -3,7 +3,7 @@
 **Title:** The Death of the Chatbot and the Birth of the Agentic Web  
 **Status:** Public Draft  
 **Date:** February 2026  
-**Authors:** KYA Labs (team@synthexai.tech)  
+**Authors:** Korven (hello@korven.cc)  
 **Discussion:** [GitHub Issues](https://github.com/theaniketgiri/aip/issues)
 
 ---
@@ -220,6 +220,6 @@ The protocol is open. The implementation is open. The future of the agentic web 
 ---
 
 <p align="center">
-  <strong>KYA Labs</strong> — Know Your Agent before it acts.<br/>
+  <strong>Korven</strong> — Know Your Agent before it acts.<br/>
   <a href="https://aip.synthexai.tech">aip.synthexai.tech</a>
 </p>

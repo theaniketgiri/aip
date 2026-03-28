@@ -196,6 +196,80 @@ agent = CrewAIAgent(...)
 shield_object(agent, passport)  # All methods now AIP-verified
 ```
 
+## Framework Integrations
+
+AIP works with any AI agent framework. Here are production-ready examples:
+
+### LangChain — Protected Tools
+
+Wrap any LangChain tool with cryptographic verification. Every tool call is signed, verified, and auditable before execution.
+
+**Problem it solves:** A LangChain agent with access to `transfer_funds` can be tricked by prompt injection into draining an account. AIP blocks unauthorized actions at the cryptographic layer — the tool never executes.
+
+```python
+from aip_protocol import AgentPassport, create_envelope, sign_envelope, verify_intent
+
+passport = AgentPassport.create(
+    domain="fintech.com",
+    agent_name="assistant",
+    allowed_actions=["search", "send_email", "transfer_funds"],
+    denied_actions=["delete_records"],
+    monetary_limit_per_txn=500,
+)
+
+# Agent tries to transfer $5,000 → BLOCKED (exceeds $500 limit)
+# Agent tries to delete records → BLOCKED (denied action)
+# Agent is compromised → KILL SWITCH → all tools dead instantly
+```
+
+→ **[Full LangChain Demo](demos/langchain_protected_tools/)**
+
+### CrewAI — Multi-Agent Compliance
+
+Give each agent in a crew its own cryptographic passport with different permissions. Revoke one agent without killing the crew.
+
+```python
+# Analyst: read-only, no monetary actions
+analyst = AgentPassport.create(
+    domain="acme-capital.com", agent_name="analyst-bot",
+    allowed_actions=["research", "analyze"], denied_actions=["trade", "delete_records"],
+    monetary_limit_per_txn=0,
+)
+
+# Trader: can trade up to $10K
+trader = AgentPassport.create(
+    domain="acme-capital.com", agent_name="trading-bot",
+    allowed_actions=["trade", "analyze"], denied_actions=["delete_records"],
+    monetary_limit_per_txn=10000,
+)
+
+# Kill only the rogue trader — analyst keeps working
+store.revoke(agent_id=trader.agent_id, reason="anomalous_trading_pattern")
+```
+
+→ **[Full CrewAI Demo](demos/crewai_financial_compliance/)**
+
+### Google ADK / Any Framework
+
+AIP is framework-agnostic. The `shield` decorator works on any Python function:
+
+```python
+@shield(passport, allowed_actions=["query_db"], monetary_limit=1000.0)
+def query_database(sql: str):
+    return db.execute(sql)
+
+# Works with Google ADK, AutoGen, DSPy, or plain Python
+```
+
+### Alternatives Compared
+
+| Approach | Identity | Intent Verification | Kill Switch | Latency |
+|----------|----------|-------------------|-------------|---------|
+| API key scoping | ❌ No agent-level | ❌ No | ❌ No | – |
+| Prompt guardrails | ❌ Bypassable | ❌ Probabilistic | ❌ No | – |
+| LLM-as-judge | ❌ No | ⚠️ Probabilistic | ❌ No | ~500ms |
+| **AIP** | ✅ Ed25519 | ✅ Deterministic | ✅ Instant | **<1ms** |
+
 ## AIP Cloud
 
 The open-source SDK handles local verification. For production multi-agent systems, [AIP Cloud](https://aip.synthexai.tech) adds:
@@ -256,6 +330,6 @@ MIT — see [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <sub><strong>KYA Labs</strong> — Know Your Agent before it acts.</sub><br/>
+  <sub><strong>Korven</strong> — Know Your Agent before it acts.</sub><br/>
   <sub><a href="https://aip.synthexai.tech">Website</a> · <a href="https://aip.synthexai.tech/docs">API Docs</a> · <a href="https://pypi.org/project/aip-protocol/">PyPI</a></sub>
 </p>

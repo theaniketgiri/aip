@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/Protocol-AIP--1-0B0D10?style=for-the-badge&labelColor=0B0D10&color=ABDBE3" alt="AIP-1" />
   <img src="https://img.shields.io/badge/Crypto-Ed25519-0B0D10?style=for-the-badge&labelColor=0B0D10&color=34D399" alt="Ed25519" />
   <img src="https://img.shields.io/pypi/v/aip-protocol?style=for-the-badge&labelColor=0B0D10&color=A78BFA&label=PyPI" alt="PyPI" />
-  <img src="https://img.shields.io/badge/Tests-63%20passing-0B0D10?style=for-the-badge&labelColor=0B0D10&color=34D399" alt="Tests" />
+  <img src="https://img.shields.io/badge/Tests-98%20passing-0B0D10?style=for-the-badge&labelColor=0B0D10&color=34D399" alt="Tests" />
   <img src="https://img.shields.io/badge/License-MIT-0B0D10?style=for-the-badge&labelColor=0B0D10&color=94A3B8" alt="License" />
 </p>
 
@@ -196,6 +196,76 @@ agent = CrewAIAgent(...)
 shield_object(agent, passport)  # All methods now AIP-verified
 ```
 
+## Observe — Agent Visibility
+
+**See what your agents are doing before you enforce what they're allowed to do.**
+
+`@observe` gives every agent a cryptographic DID identity and logs all actions — zero enforcement, zero overhead. When you need enforcement, change one decorator.
+
+```python
+from aip_protocol import passport, observe
+
+# Give your agent an identity
+agent = passport(name="payment-bot", domain="acme.com")
+
+# Observe — logs everything, blocks nothing
+@observe(agent)
+def process_payment(to: str, amount: float):
+    return stripe.charge(to, amount)
+
+process_payment("vendor@acme.com", 150.00)  # ✓ Executes + logged
+process_payment("vendor@acme.com", 9999.00) # ✓ Executes + logged (no enforcement)
+```
+
+### What gets logged
+
+Every call captures structured data — no config needed:
+
+| Field | Example |
+|---|---|
+| `agent_id` | `did:web:acme.com:agents:payment-bot` |
+| `action` | `process_payment` |
+| `parameters` | `{"to": "vendor@acme.com", "amount": 150.00}` |
+| `latency_ms` | `3.42` |
+| `success` | `true` |
+| `timestamp` | `2026-03-30T06:00:00Z` |
+
+### Observe a class — all public methods logged
+
+```python
+@observe(agent)
+class DataAnalyst:
+    def read_data(self, source: str): ...
+    def analyze(self, query: str): ...
+    def generate_report(self, title: str): ...
+```
+
+### The upgrade path — one line changes everything
+
+```diff
+- @observe(agent)
++ @shield(actions=["process_payment"], limit=500)
+  def process_payment(to: str, amount: float):
+      return stripe.charge(to, amount)
+```
+
+Same passport. Same DID. Zero architecture change. Full cryptographic enforcement.
+
+### Stats & Export
+
+```python
+from aip_protocol import get_observation_store
+
+store = get_observation_store()
+print(store.stats("did:web:acme.com:agents:payment-bot"))
+# → {"total": 247, "success": 245, "errors": 2}
+
+# Export all events as JSON
+store.export_json()
+```
+
+→ **[Full Observe Demo](examples/09_observe_agents.py)**
+
 ## Framework Integrations
 
 AIP works with any AI agent framework. Here are production-ready examples:
@@ -293,7 +363,7 @@ git clone https://github.com/theaniketgiri/aip.git
 cd aip
 pip install -e ".[dev]"
 pytest tests/ -v
-# 63 tests, all passing
+# 98 tests, all passing
 ```
 
 ### Project Structure
@@ -304,6 +374,7 @@ aip_protocol/
 ├── envelope.py       # Intent envelope creation + signing
 ├── verification.py   # 8-step verification pipeline + intent classifier
 ├── shield.py         # One-liner AIP protection (helmet.js for AI)
+├── observe.py        # Lightweight observability — @observe decorator
 ├── crypto.py         # Ed25519 + HMAC cryptographic layer
 ├── errors.py         # AIP-Exxx error taxonomy (22 structured codes)
 ├── revocation.py     # Real-time revocation store with rehydration

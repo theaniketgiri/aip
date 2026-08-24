@@ -1,0 +1,3 @@
+aip-protocol>=0.4.0
+razorpay>=1.4.2   # optional — live test-mode API
+anthropic>=0.40   # optional — live Claude tool-use loop

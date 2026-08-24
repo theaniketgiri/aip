@@ -1,0 +1,430 @@
+[
+  {
+    "ts": "2026-08-24T19:30:22.817311+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 75000,
+      "payee": "vendor@supplier.in",
+      "description": "Invoice INV-2231"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 75000,
+    "currency": "INR",
+    "latency_ms": 1.96,
+    "provider_ref": "plink_sim_f2efaede7599"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.819055+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "fetch_payments",
+    "parameters": {
+      "count": 3
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": null,
+    "currency": "INR",
+    "latency_ms": 1.39,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.820621+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 4500000,
+      "payee": "attacker@evil.example",
+      "description": "urgent vendor settlement"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 4500000,
+    "currency": "INR",
+    "latency_ms": 1.39,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.822583+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.5,
+    "provider_ref": "plink_sim_6784b76c99e6"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.824164+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.57,
+    "provider_ref": "plink_sim_915fd5fc966c"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.825786+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.6,
+    "provider_ref": "plink_sim_f4a8175bebdd"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.827169+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.36,
+    "provider_ref": "plink_sim_f1aeadebc50a"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.828863+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.75,
+    "provider_ref": "plink_sim_117a7a85d3d9"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.831055+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 2.17,
+    "provider_ref": "plink_sim_8b41bcbff76e"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.832909+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.76,
+    "provider_ref": "plink_sim_a55ba4acd3cc"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.834289+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.34,
+    "provider_ref": "plink_sim_814ce39afd23"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.835801+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.52,
+    "provider_ref": "plink_sim_7c4fa9f4d44e"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.837780+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 2.0,
+    "provider_ref": "plink_sim_c925b8d111bf"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.839330+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.41,
+    "provider_ref": "plink_sim_5e7b6eef64b5"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.840612+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "allow",
+    "error_codes": [],
+    "reason": "Tier 0 fast-path: signature + boundaries verified",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.27,
+    "provider_ref": "plink_sim_e88a687cb498"
+  },
+  {
+    "ts": "2026-08-24T19:30:22.841898+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.24,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.843740+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.82,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.844911+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.19,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.846314+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.36,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.847620+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.24,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.849199+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.56,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.850719+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.52,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.852305+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "create_payment_link",
+    "parameters": {
+      "amount_minor": 9900,
+      "payee": "vendor@supplier.in"
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E202"
+    ],
+    "reason": "Boundary violation",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": 9900,
+    "currency": "INR",
+    "latency_ms": 1.49,
+    "provider_ref": null
+  },
+  {
+    "ts": "2026-08-24T19:30:22.853856+00:00",
+    "agent_id": "did:web:acme-retail.in:agents:payouts-bot",
+    "tool": "fetch_payments",
+    "parameters": {
+      "count": 3
+    },
+    "decision": "deny",
+    "error_codes": [
+      "AIP-E400"
+    ],
+    "reason": "Agent has been revoked",
+    "mandate_id": "mandate:e33fe2758efb45b3bb0b216855cb00ad",
+    "amount_minor": null,
+    "currency": "INR",
+    "latency_ms": 1.26,
+    "provider_ref": null
+  }
+]

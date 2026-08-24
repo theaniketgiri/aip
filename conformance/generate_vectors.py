@@ -96,6 +96,7 @@ def make_envelope(
     denied_actions=None,
     monetary_limit=500.0,
     geo_restriction=None,
+    issued_at=None,
 ) -> IntentEnvelope:
     """Build a proper Pydantic IntentEnvelope."""
     return IntentEnvelope(
@@ -147,7 +148,7 @@ def make_envelope(
         verification_tier=tier,
         entropy=nonce,
         ttl=300,
-        issued_at=T_NOW,
+        issued_at=issued_at or T_NOW,
         expires_at=expires_at,
     )
 
@@ -259,6 +260,41 @@ vectors["A04_missing_action"] = {
     "envelope": to_dict(e),
     "verify_with": "agent_1",
     "expected": {"valid": False, "errors": ["AIP-E103"]},
+}
+
+
+# AIP-1 §14.3: an envelope that omits expires_at MUST be treated as expiring
+# DEFAULT_TTL_SECONDS (300) after issue — absent expiry is NOT "never expires".
+e = sign_env(make_envelope(
+    nonce=nonce(),
+    expires_at=None,
+    issued_at=T_NOW - timedelta(seconds=600),
+))
+vectors["A06_absent_expiry_defaults_to_ttl"] = {
+    "description": (
+        "An envelope with no expires_at, issued 600s before evaluation, MUST be "
+        "rejected with AIP-E101 (default TTL is 300s per RFC 14.3)."
+    ),
+    "category": "envelope_validity",
+    "envelope": to_dict(e),
+    "verify_with": "agent_1",
+    "expected": {"valid": False, "errors": ["AIP-E101"]},
+}
+
+e = sign_env(make_envelope(
+    nonce=nonce(),
+    expires_at=None,
+    issued_at=T_NOW - timedelta(seconds=60),
+))
+vectors["A07_absent_expiry_within_ttl_passes"] = {
+    "description": (
+        "An envelope with no expires_at, issued 60s before evaluation, MUST pass "
+        "— it is still inside the 300s default TTL."
+    ),
+    "category": "envelope_validity",
+    "envelope": to_dict(e),
+    "verify_with": "agent_1",
+    "expected": {"valid": True},
 }
 
 

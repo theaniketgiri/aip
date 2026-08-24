@@ -62,10 +62,28 @@ class Attestation(BaseModel):
 
 
 class MonetaryLimit(BaseModel):
-    """Monetary boundaries — the cage for financial actions."""
+    """
+    Monetary boundaries — the cage for financial actions.
+
+    The wire format carries major units for readability, but ALL comparisons
+    are performed on the `*_minor` integer properties. Never compare the float
+    fields directly — see aip_protocol.money for why.
+    """
     per_transaction: float = Field(default=0.0, ge=0.0)
     per_day: float = Field(default=0.0, ge=0.0)
     currency: str = "USD"
+
+    @property
+    def per_transaction_minor(self) -> int:
+        """Per-transaction cap in exact integer minor units. 0 means no cap."""
+        from aip_protocol.money import to_minor
+        return to_minor(self.per_transaction, self.currency)
+
+    @property
+    def per_day_minor(self) -> int:
+        """Rolling 24h cap in exact integer minor units. 0 means no cap."""
+        from aip_protocol.money import to_minor
+        return to_minor(self.per_day, self.currency)
 
 
 class TimeWindow(BaseModel):
@@ -187,6 +205,7 @@ class VerificationResult(BaseModel):
     revocation: RevocationCheck = Field(default_factory=RevocationCheck)
     trust_score: float = Field(default=0.0, ge=0.0, le=1.0)
     tier_used: VerificationTier = VerificationTier.TIER_1
+    mandate_id: str | None = None  # set when a signed mandate governed this decision
     errors: list[AIPErrorCode] = Field(default_factory=list)
     detail: str = ""
 

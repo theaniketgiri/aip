@@ -165,8 +165,13 @@ class AgentPassport:
             raise ValueError("No public key loaded")
         return self._public_key
 
-    def save(self, directory: str | Path) -> None:
-        """Save passport data + keys to a directory."""
+    def save(self, directory: str | Path, password: str | bytes | None = None) -> None:
+        """
+        Save passport data + keys to a directory.
+
+        The private key is written 0600 and encrypted when a passphrase is given
+        (or AIP_KEY_PASSPHRASE is set) — see AIP-1 §11.2/§14.4.
+        """
         directory = Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
@@ -183,13 +188,13 @@ class AgentPassport:
 
         # Save keys
         if self._private_key:
-            save_private_key(self._private_key, directory / "private.pem")
+            save_private_key(self._private_key, directory / "private.pem", password=password)
         if self._public_key:
             save_public_key(self._public_key, directory / "public.pem")
 
     @classmethod
-    def load(cls, directory: str | Path) -> AgentPassport:
-        """Load a passport from a directory."""
+    def load(cls, directory: str | Path, password: str | bytes | None = None) -> AgentPassport:
+        """Load a passport from a directory, decrypting the private key if needed."""
         directory = Path(directory)
 
         passport_data = json.loads((directory / "passport.json").read_text())
@@ -205,7 +210,7 @@ class AgentPassport:
         public_key_path = directory / "public.pem"
 
         if private_key_path.exists():
-            private_key = load_private_key(private_key_path)
+            private_key = load_private_key(private_key_path, password=password)
             public_key = private_key.public_key()
         elif public_key_path.exists():
             public_key = load_public_key(public_key_path)

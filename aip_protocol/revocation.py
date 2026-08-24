@@ -35,11 +35,19 @@ class RevocationStore:
     # Maximum nonce cache size to prevent unbounded memory growth
     MAX_NONCE_CACHE = 100_000
 
-    def __init__(self) -> None:
+    def __init__(self, authoritative: bool = True) -> None:
+        """
+        Args:
+            authoritative: True for a local store that owns its revocation state
+                (never stale). False for a replica mirroring a remote registry —
+                replicas are staleness-checked and fail CLOSED with AIP-E501 once
+                their data exceeds max_staleness_ms.
+        """
         self._revocations: dict[str, RevocationRecord] = {}
         self._nonce_cache: set[str] = set()
         self._lock = Lock()
         self._last_sync: datetime = datetime.now(timezone.utc)
+        self.authoritative = authoritative
 
     @property
     def last_sync_time(self) -> datetime:

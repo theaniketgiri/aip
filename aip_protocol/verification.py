@@ -20,7 +20,7 @@ Tier-aware verification:
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
@@ -28,12 +28,16 @@ from aip_protocol.crypto import verify_signature, hmac_verify
 from aip_protocol.envelope import _get_signable_payload
 from aip_protocol.errors import AIPError, AIPErrorCode
 from aip_protocol.models import (
+    Boundaries,
     IntentEnvelope,
     RevocationCheck,
     RevocationStatus,
     VerificationResult,
     VerificationTier,
 )
+from aip_protocol.ledger import SpendLedger
+from aip_protocol.mandate import Mandate, verify_mandate
+from aip_protocol.money import MoneyError, extract_amount_minor
 from aip_protocol.revocation import RevocationStore
 from aip_protocol.trust import TrustScoreEngine
 
@@ -41,9 +45,13 @@ from aip_protocol.trust import TrustScoreEngine
 # Default singletons for convenience
 _default_revocation_store = RevocationStore()
 _default_trust_engine = TrustScoreEngine()
+_default_spend_ledger = SpendLedger()
 
 
 SUPPORTED_VERSIONS = {"1.0.0"}
+
+# AIP-1 §14.3: default lifetime for envelopes that omit expires_at.
+DEFAULT_TTL_SECONDS = 300
 PROTOCOL_VERSION = "1.0.0"
 
 
@@ -84,7 +92,7 @@ def _classify_action_group(action: str) -> str | None:
     return None
 
 
-def _check_intent_drift(envelope: IntentEnvelope) -> bool:
+def _check_intent_drift(envelope: IntentEnvelope, boundaries: 'Boundaries | None' = None) -> bool:
     """
     Lightweight intent classifier — checks if the action semantically
     aligns with the agent's allowed_actions.
@@ -93,7 +101,7 @@ def _check_intent_drift(envelope: IntentEnvelope) -> bool:
     Returns False if action is semantically outside the agent's scope.
     """
     action = envelope.intent.action
-    allowed = envelope.boundaries.allowed_actions
+    allowed = (boundaries or envelope.boundaries).allowed_actions
 
     # If no allowed_actions defined, can't check drift
     if not allowed:
@@ -133,6 +141,11 @@ def verify_intent(
     known_prompt_hashes: dict[str, str] | None = None,
     request_geo: str | None = None,
     max_revocation_staleness_ms: int | None = None,
+    now: datetime | None = None,
+    mandate: Mandate | None = None,
+    issuer_public_key: Ed25519PublicKey | None = None,
+    require_mandate: bool = False,
+    spend_ledger: SpendLedger | None = None,
 ) -> VerificationResult:
     """
     Verify an Intent Envelope through the AIP handshake.
@@ -154,6 +167,16 @@ def verify_intent(
         known_prompt_hashes: Map of agent_id → expected prompt hash
         request_geo: ISO country code of the request origin (for geo check)
         max_revocation_staleness_ms: Override max staleness for revocation data
+        now: Reference time for expiry/time-window checks. Defaults to the
+            current UTC time; pass an explicit value for deterministic
+            conformance testing or audit-log replay.
+        mandate: Signed grant of authority from the principal. When present,
+            its boundaries REPLACE the envelope's self-declared boundaries.
+        issuer_public_key: Public key of the mandate issuer. Required to
+            validate a mandate.
+        require_mandate: Reject envelopes that arrive without a mandate
+            (AIP-E405). Recommended for any cross-party deployment.
+        spend_ledger: Rolling-window ledger used to enforce per_day limits.
 
     Returns:
         VerificationResult with all check results and any error codes
@@ -184,15 +207,24 @@ def verify_intent(
         return _fail(result, errors, "Intent envelope missing agent identity")
 
     # ─── Step 3: EXPIRY_CHECK (all tiers) ─────────────────────────────
-    now = datetime.now(timezone.utc)
+    now = now if now is not None else datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
 
-    if envelope.expires_at is not None:
-        expires = envelope.expires_at
-        if expires.tzinfo is None:
-            expires = expires.replace(tzinfo=timezone.utc)
-        if now > expires:
-            errors.append(AIPErrorCode.EXPIRED_ENVELOPE)
-            return _fail(result, errors, "Intent envelope has expired")
+    # AIP-1 §14.3: an envelope without expires_at is treated as expiring
+    # DEFAULT_TTL_SECONDS after issue — absent expiry MUST NOT mean "never expires".
+    expires = envelope.expires_at
+    if expires is None:
+        issued = envelope.issued_at
+        if issued.tzinfo is None:
+            issued = issued.replace(tzinfo=timezone.utc)
+        expires = issued + timedelta(seconds=DEFAULT_TTL_SECONDS)
+    elif expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+
+    if now > expires:
+        errors.append(AIPErrorCode.EXPIRED_ENVELOPE)
+        return _fail(result, errors, "Intent envelope has expired")
 
     # ─── Step 3b: NONCE_VALIDATION (all tiers) ──────────────────────
     # AIP-1 §10: Nonces MUST be at least 16 bytes of entropy.
@@ -224,8 +256,34 @@ def verify_intent(
 
     result.signature_valid = True
 
+    # ─── Step 4b: MANDATE_CHECK ───────────────────────────────────────
+    # An envelope's own `boundaries` are signed by the agent, so an agent can
+    # widen its own cage at will. A mandate is signed by the PRINCIPAL with a
+    # key the agent does not hold, so it cannot be widened by the agent. When
+    # one is present it is authoritative and the envelope's claim is ignored.
+    effective_boundaries = envelope.boundaries
+
+    if mandate is not None:
+        if issuer_public_key is None:
+            errors.append(AIPErrorCode.MANDATE_INVALID)
+            return _fail(result, errors, "Mandate supplied without an issuer public key to verify it")
+        mandate_errors = verify_mandate(mandate, issuer_public_key, envelope.agent.id, now=now)
+        if mandate_errors:
+            errors.extend(mandate_errors)
+            trust.record_violation(envelope.agent.id)
+            return _fail(result, errors, "Mandate verification failed")
+        effective_boundaries = mandate.boundaries
+        result.mandate_id = mandate.mandate_id
+    elif require_mandate:
+        errors.append(AIPErrorCode.MANDATE_REQUIRED)
+        return _fail(result, errors, "Verifier requires a signed mandate; envelope carried none")
+
     # ─── Step 5: BOUNDARY_CHECK (all tiers) ───────────────────────────
-    boundary_ok, boundary_errors = _check_boundaries(envelope, request_geo=request_geo)
+    ledger = spend_ledger or _default_spend_ledger
+    boundary_ok, boundary_errors, amount_minor = _check_boundaries(
+        envelope, request_geo=request_geo, now=now,
+        boundaries=effective_boundaries, spend_ledger=ledger,
+    )
     if not boundary_ok:
         errors.extend(boundary_errors)
         result.within_boundaries = False
@@ -237,6 +295,26 @@ def verify_intent(
     # ─── Step 5b: REVOCATION_CHECK (all tiers — security critical) ────
     # Revocation must be checked even on Tier 0 to prevent suspended/revoked
     # agents from bypassing the kill switch via the fast path.
+    #
+    # Staleness is enforced here too: a replica whose data has aged out cannot
+    # prove an agent is un-revoked, so it fails CLOSED (AIP-E501) at every tier.
+    # Checking this only at Tier 1+ would let the fast path trust stale data.
+    staleness_budget_ms = max_revocation_staleness_ms or 500
+    if not store.authoritative and store.last_sync_time is not None:
+        age_ms = (now - store.last_sync_time).total_seconds() * 1000
+        if age_ms > staleness_budget_ms:
+            result.revocation = RevocationCheck(
+                status=RevocationStatus.REVOKED,
+                freshness=store.last_sync_time,
+                max_staleness_ms=staleness_budget_ms,
+                confidence="stale",
+            )
+            errors.append(AIPErrorCode.REVOCATION_STALE)
+            return _fail(
+                result, errors,
+                f"Revocation data is stale ({age_ms:.0f}ms > {staleness_budget_ms}ms) — failing closed",
+            )
+
     if store.is_revoked(envelope.agent.id):
         is_suspended = store.is_suspended(envelope.agent.id)
         if is_suspended:
@@ -248,6 +326,7 @@ def verify_intent(
 
     # ═══ Tier 0 stops here — fast path complete ═══════════════════════
     if tier == VerificationTier.TIER_0:
+        _record_spend(ledger, envelope, effective_boundaries, amount_minor, now)
         trust.record_success(envelope.agent.id)
         result.valid = True
         result.attestation_match = True  # N/A for Tier 0, mark as passed
@@ -269,11 +348,16 @@ def verify_intent(
     result.attestation_match = True
 
     # ─── Step 7: REVOCATION_CHECK (Tier 1 & 2) ────────────────────────
-    staleness_ms = max_revocation_staleness_ms or 500
-    revocation_check = _check_revocation(envelope, store, max_staleness_ms=staleness_ms)
+    revocation_check = _check_revocation(envelope, store, max_staleness_ms=staleness_budget_ms, now=now)
     result.revocation = revocation_check
 
     if revocation_check.status == RevocationStatus.REVOKED:
+        if revocation_check.confidence == "stale":
+            errors.append(AIPErrorCode.REVOCATION_STALE)
+            return _fail(
+                result, errors,
+                f"Revocation data is stale (>{revocation_check.max_staleness_ms}ms) — failing closed",
+            )
         errors.append(AIPErrorCode.AGENT_REVOKED)
         return _fail(result, errors, "Agent has been revoked")
 
@@ -283,6 +367,7 @@ def verify_intent(
 
     # ═══ Tier 1 stops here — standard path complete ═══════════════════
     if tier == VerificationTier.TIER_1:
+        _record_spend(ledger, envelope, effective_boundaries, amount_minor, now)
         trust.record_success(envelope.agent.id)
         result.valid = True
         result.errors = []
@@ -290,13 +375,13 @@ def verify_intent(
         return result
 
     # ─── Step 7b: INTENT_DRIFT CHECK (Tier 2 only) ────────────────────
-    if not _check_intent_drift(envelope):
+    if not _check_intent_drift(envelope, boundaries=effective_boundaries):
         errors.append(AIPErrorCode.INTENT_DRIFT)
         trust.record_violation(envelope.agent.id)
         return _fail(result, errors, f"Intent classifier flagged '{envelope.intent.action}' as outside declared boundaries")
 
     # ─── Step 7c: DELEGATION_CHECK (Tier 2 only) ──────────────────────
-    delegation_ok, delegation_errors = _check_delegation(envelope)
+    delegation_ok, delegation_errors = _check_delegation(envelope, now=now)
     if not delegation_ok:
         errors.extend(delegation_errors)
         return _fail(result, errors, "Delegation chain validation failed")
@@ -312,6 +397,7 @@ def verify_intent(
             return _fail(result, errors, f"Trust score {score} below threshold {min_trust_score}")
 
     # ─── ALL CHECKS PASSED ────────────────────────────────────────────
+    _record_spend(ledger, envelope, effective_boundaries, amount_minor, now)
     trust.record_success(envelope.agent.id)
     result.valid = True
     result.errors = []
@@ -321,14 +407,32 @@ def verify_intent(
 
 # ── Boundary Check ─────────────────────────────────────────────────────────
 
+def _record_spend(ledger, envelope, boundaries, amount_minor, now) -> None:
+    """Commit an authorized amount to the rolling ledger. Success paths only."""
+    if amount_minor and boundaries.monetary_limit.per_day_minor > 0:
+        ledger.record(
+            envelope.agent.id, amount_minor,
+            boundaries.monetary_limit.currency, now=now,
+        )
+
+
 def _check_boundaries(
     envelope: IntentEnvelope,
     request_geo: str | None = None,
-) -> tuple[bool, list[AIPErrorCode]]:
-    """Check if the intent is within the declared boundaries."""
+    now: datetime | None = None,
+    boundaries: "Boundaries | None" = None,
+    spend_ledger: SpendLedger | None = None,
+) -> tuple[bool, list[AIPErrorCode], int | None]:
+    """
+    Check the intent against the effective boundaries.
+
+    Returns (ok, errors, amount_minor) — the amount is handed back so a
+    caller can commit it to the spend ledger once the whole pipeline passes.
+    """
     errors: list[AIPErrorCode] = []
     action = envelope.intent.action
-    boundaries = envelope.boundaries
+    boundaries = boundaries if boundaries is not None else envelope.boundaries
+    limit = boundaries.monetary_limit
 
     # Check denied actions first (deny takes precedence)
     if action in boundaries.denied_actions:
@@ -338,16 +442,29 @@ def _check_boundaries(
     if boundaries.allowed_actions and action not in boundaries.allowed_actions:
         errors.append(AIPErrorCode.ACTION_NOT_ALLOWED)
 
-    # Check monetary limits
-    amount = envelope.intent.parameters.get("amount")
-    if amount is not None and isinstance(amount, (int, float)):
-        if boundaries.monetary_limit.per_transaction > 0:
-            if amount > boundaries.monetary_limit.per_transaction:
+    # ── Monetary limits, in exact integer minor units ──
+    try:
+        amount_minor = extract_amount_minor(envelope.intent.parameters, limit.currency)
+    except MoneyError:
+        return False, [AIPErrorCode.SCHEMA_INVALID], None
+
+    if amount_minor is not None:
+        # Per-transaction cap (RFC §4.3)
+        if limit.per_transaction_minor > 0 and amount_minor > limit.per_transaction_minor:
+            errors.append(AIPErrorCode.MONETARY_LIMIT)
+
+        # Cumulative rolling-window cap (RFC §4.3) — a per-txn cap alone is
+        # defeated by splitting one payment into many.
+        elif limit.per_day_minor > 0 and spend_ledger is not None:
+            if spend_ledger.would_exceed(
+                envelope.agent.id, amount_minor, limit.per_day_minor,
+                limit.currency, now=now,
+            ):
                 errors.append(AIPErrorCode.MONETARY_LIMIT)
 
     # Check time window
     if boundaries.time_window is not None:
-        now = datetime.now(timezone.utc)
+        now = now or datetime.now(timezone.utc)
         window = boundaries.time_window
         start = window.start if window.start.tzinfo else window.start.replace(tzinfo=timezone.utc)
         end = window.end if window.end.tzinfo else window.end.replace(tzinfo=timezone.utc)
@@ -360,7 +477,7 @@ def _check_boundaries(
         if request_geo.upper() not in allowed_geos:
             errors.append(AIPErrorCode.GEO_RESTRICTION)
 
-    return len(errors) == 0, errors
+    return len(errors) == 0, errors, amount_minor
 
 
 # ── Attestation Check ──────────────────────────────────────────────────────
@@ -402,6 +519,7 @@ def _check_attestation(
 
 def _check_delegation(
     envelope: IntentEnvelope,
+    now: datetime | None = None,
 ) -> tuple[bool, list[AIPErrorCode]]:
     """
     Validate the delegation chain from principal → agent.
@@ -416,7 +534,7 @@ def _check_delegation(
             errors.append(AIPErrorCode.DELEGATION_INVALID)
         return len(errors) == 0, errors
 
-    now = datetime.now(timezone.utc)
+    now = now or datetime.now(timezone.utc)
 
     # Verify chain starts from the principal
     if chain[0].from_id != envelope.principal.id:
@@ -453,20 +571,24 @@ def _check_revocation(
     envelope: IntentEnvelope,
     store: RevocationStore,
     max_staleness_ms: int = 500,
+    now: datetime | None = None,
 ) -> RevocationCheck:
     """Check agent's revocation status with freshness enforcement."""
-    now = datetime.now(timezone.utc)
+    now = now or datetime.now(timezone.utc)
 
     # Check revocation data freshness (AIP-E501)
+    # Staleness only applies to replica stores that mirror a remote registry.
+    # An authoritative local store is never stale by definition.
     last_sync = store.last_sync_time
-    if last_sync is not None:
+    if not store.authoritative and last_sync is not None:
         staleness_ms = (now - last_sync).total_seconds() * 1000
         if staleness_ms > max_staleness_ms:
+            # Fail closed: we cannot prove the agent is un-revoked (AIP-E501).
             return RevocationCheck(
-                status=RevocationStatus.NOT_REVOKED,
+                status=RevocationStatus.REVOKED,
                 freshness=last_sync,
                 max_staleness_ms=max_staleness_ms,
-                confidence="weak",  # Stale data — can't be sure
+                confidence="stale",
             )
 
     if store.is_revoked(envelope.agent.id):

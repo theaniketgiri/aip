@@ -41,6 +41,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from aip_protocol.models import IntentEnvelope, VerificationTier
 from aip_protocol.verification import verify_intent
+
+# Set from vectors.json _meta.generated_at at load time.
+SUITE_REFERENCE_TIME: datetime | None = None
+
+
+def _reference_time(vector: dict) -> datetime | None:
+    """Reference clock for a vector: its own override, else the suite default."""
+    override = vector.get("evaluate_at")
+    if override:
+        return datetime.fromisoformat(override.replace("Z", "+00:00"))
+    return SUITE_REFERENCE_TIME
 from aip_protocol.revocation import RevocationStore
 from aip_protocol.envelope import _get_signable_payload
 
@@ -146,6 +157,10 @@ def run_vector(
         hmac_key = None
         public_key = keys[verify_key_name]
 
+    # Vectors are evaluated at a fixed reference time so the suite is
+    # deterministic — otherwise every vector expires as wall-clock advances.
+    reference_time = _reference_time(vector)
+
     # --- Deserialize envelope ---
     envelope = deserialize_envelope(vector["envelope"])
 
@@ -158,6 +173,7 @@ def run_vector(
             revocation_store=store,
             hmac_key=hmac_key,
             request_geo=vector.get("request_geo"),
+            now=reference_time,
         )
         expected_first = vector.get("expected_first", {"valid": True})
         if expected_first.get("valid") and not first_result.valid:
@@ -172,6 +188,7 @@ def run_vector(
             revocation_store=store,
             hmac_key=hmac_key,
             request_geo=vector.get("request_geo"),
+            now=reference_time,
         )
     else:
         # --- Normal single verification ---
@@ -181,6 +198,7 @@ def run_vector(
             revocation_store=store,
             hmac_key=hmac_key,
             request_geo=vector.get("request_geo"),
+            now=reference_time,
         )
 
     # --- Assert results ---
@@ -281,6 +299,10 @@ def run_conformance(
         data = json.load(f)
 
     meta = data.pop("_meta")
+    global SUITE_REFERENCE_TIME
+    SUITE_REFERENCE_TIME = datetime.fromisoformat(
+        meta["generated_at"].replace("Z", "+00:00")
+    )
     keys = load_key_material(meta)
 
     print(f"\n{BOLD}AIP-1 Conformance Test Suite{RESET}")

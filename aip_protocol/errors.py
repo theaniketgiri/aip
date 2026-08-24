@@ -42,6 +42,10 @@ class AIPErrorCode(str, Enum):
     PRINCIPAL_REVOKED = "AIP-E402"
     DELEGATION_INVALID = "AIP-E403"
     TRUST_SCORE_LOW = "AIP-E404"
+    MANDATE_REQUIRED = "AIP-E405"
+    MANDATE_INVALID = "AIP-E406"
+    MANDATE_EXPIRED = "AIP-E407"
+    MANDATE_SUBJECT_MISMATCH = "AIP-E408"
 
     # E5xx — Protocol Errors
     MESH_UNAVAILABLE = "AIP-E500"
@@ -71,6 +75,10 @@ ERROR_DESCRIPTIONS: dict[AIPErrorCode, str] = {
     AIPErrorCode.PRINCIPAL_REVOKED: "Principal organization has been revoked",
     AIPErrorCode.DELEGATION_INVALID: "Delegation chain is broken, expired, or violates monotonicity",
     AIPErrorCode.TRUST_SCORE_LOW: "Agent trust score is below verifier's minimum threshold",
+    AIPErrorCode.MANDATE_REQUIRED: "Verifier requires a signed mandate and the envelope carried none",
+    AIPErrorCode.MANDATE_INVALID: "Mandate signature is not valid for the declared issuer",
+    AIPErrorCode.MANDATE_EXPIRED: "Mandate validity window has passed",
+    AIPErrorCode.MANDATE_SUBJECT_MISMATCH: "Mandate was not issued to the agent presenting it",
     AIPErrorCode.MESH_UNAVAILABLE: "Cannot reach the AIP verification mesh",
     AIPErrorCode.REVOCATION_STALE: "Revocation data is older than the allowed max_staleness",
     AIPErrorCode.HANDSHAKE_TIMEOUT: "AIP verification handshake timed out",

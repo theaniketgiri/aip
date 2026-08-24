@@ -11,6 +11,8 @@ This module handles:
 from __future__ import annotations
 
 import base64
+import os
+import warnings
 from pathlib import Path
 
 from cryptography.exceptions import InvalidSignature
@@ -48,16 +50,54 @@ def verify_signature(
         return False
 
 
-def save_private_key(key: Ed25519PrivateKey, path: str | Path) -> None:
-    """Save a private key to PEM file."""
+def _resolve_passphrase(password: str | bytes | None) -> bytes | None:
+    """Resolve a key passphrase from an argument or the AIP_KEY_PASSPHRASE env var."""
+    if password is None:
+        password = os.environ.get("AIP_KEY_PASSPHRASE") or None
+    if password is None:
+        return None
+    return password.encode("utf-8") if isinstance(password, str) else password
+
+
+def save_private_key(
+    key: Ed25519PrivateKey,
+    path: str | Path,
+    password: str | bytes | None = None,
+) -> None:
+    """
+    Save a private key to a PEM file with owner-only permissions (0600).
+
+    AIP-1 §11.2/§14.4 require private keys to be encrypted at rest. Pass a
+    passphrase, or set AIP_KEY_PASSPHRASE, to encrypt with PKCS#8 + AES.
+    Unencrypted keys are still written 0600 and emit a warning.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+
+    secret = _resolve_passphrase(password)
+    if secret:
+        algorithm = serialization.BestAvailableEncryption(secret)
+    else:
+        algorithm = serialization.NoEncryption()
+        warnings.warn(
+            "aip-protocol: writing an unencrypted private key. AIP-1 §14.4 requires "
+            "keys to be encrypted at rest. Pass password=... or set AIP_KEY_PASSPHRASE.",
+            UserWarning,
+            stacklevel=2,
+        )
+
     pem = key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
-        encryption_algorithm=serialization.NoEncryption(),
+        encryption_algorithm=algorithm,
     )
-    path.write_bytes(pem)
+    # Create with 0600 before writing so the key is never briefly world-readable.
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.write(fd, pem)
+    finally:
+        os.close(fd)
+    os.chmod(path, 0o600)
 
 
 def save_public_key(key: Ed25519PublicKey, path: str | Path) -> None:
@@ -71,10 +111,13 @@ def save_public_key(key: Ed25519PublicKey, path: str | Path) -> None:
     path.write_bytes(pem)
 
 
-def load_private_key(path: str | Path) -> Ed25519PrivateKey:
-    """Load a private key from PEM file."""
+def load_private_key(
+    path: str | Path,
+    password: str | bytes | None = None,
+) -> Ed25519PrivateKey:
+    """Load a private key from PEM file, decrypting with a passphrase if needed."""
     pem = Path(path).read_bytes()
-    key = serialization.load_pem_private_key(pem, password=None)
+    key = serialization.load_pem_private_key(pem, password=_resolve_passphrase(password))
     if not isinstance(key, Ed25519PrivateKey):
         raise TypeError(f"Expected Ed25519PrivateKey, got {type(key).__name__}")
     return key

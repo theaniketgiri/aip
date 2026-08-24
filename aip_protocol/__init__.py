@@ -22,6 +22,9 @@ from aip_protocol.envelope import create_envelope, sign_envelope
 from aip_protocol.verification import verify_intent
 from aip_protocol.errors import AIPError, AIPErrorCode
 from aip_protocol.revocation import RevocationStore
+from aip_protocol.ledger import SpendLedger
+from aip_protocol.mandate import Mandate, issue_mandate, verify_mandate
+from aip_protocol.money import to_minor, from_minor, format_minor, MoneyError
 from aip_protocol.crypto import generate_keypair, hmac_sign, hmac_verify, generate_hmac_key
 from aip_protocol.shield import protect, protect_agent, shield, shield_class, shield_object, AIPViolation
 from aip_protocol.observe import (
@@ -52,6 +55,14 @@ __all__ = [
     "AIPError",
     "AIPErrorCode",
     "RevocationStore",
+    "SpendLedger",
+    "Mandate",
+    "issue_mandate",
+    "verify_mandate",
+    "to_minor",
+    "from_minor",
+    "format_minor",
+    "MoneyError",
     "generate_keypair",
     "generate_hmac_key",
     "hmac_sign",
